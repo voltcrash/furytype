@@ -14,15 +14,15 @@ let currentConsistency = 100;
 let paragraphs = [];
 
 function fetchParagraphs() {
-    const xhr = new XMLHttpRequest(); // 1. Open the connection(Gathering Information)
-    xhr.open('GET', 'assets/data/paragraphs.txt', true);  // 2. Request Initialization (by setting the URL)
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'assets/data/paragraphs.txt', true);
 
-    xhr.onload = function () { // 4. Use call back method
+    xhr.onload = function () {
         if (xhr.status === 200) {
-            paragraphs = xhr.responseText.split('\n').filter(line => line.trim() !== ''); // Split by newline and filter out empty lines
+            paragraphs = xhr.responseText.split('\n').filter(line => line.trim() !== '');
             if (paragraphs.length > 0) {
                 testText = getRandomParagraph();
-                initializeTypingTest(); // Initialize test after paragraphs are fetched
+                initializeTypingTest();
             } else {
                 console.error("No paragraphs fetched")
             }
@@ -33,7 +33,7 @@ function fetchParagraphs() {
     xhr.onerror = function () {
         console.error("request failed")
     };
-    xhr.send(); //5. send the request
+    xhr.send();
 }
 
 
