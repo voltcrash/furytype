@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FuryType - Typing Practice Scores</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #e4e4e4;
+            padding: 20px;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 10px;
+            background: #2c2f3f;
+            border-radius: 5px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            background: #3a3d4f;
+            border: 1px solid #ff8c00;
+            color: white;
+            border-radius: 4px;
+        }
+        .selected {
+            background: #ff8c00;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #3a3d4f;
+            text-align: left;
+        }
+        th {
+            background: #ff8c00;
+            color: white;
+            cursor: pointer;
+        }
+        tr:hover {
+            background: #2c2f3f;
+        }
+        button {
+            background: #ff8c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .stats {
+            color: #ff8c00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body ng-app="furytypeApp">
+    <div ng-controller="userCtrl">
+        <h1>Scores</h1>
+
+        <div class="controls">
+            <button ng-click="loadUsers()">Load Data</button>
+            <input type="text"
+                   ng-model="searchText"
+                   placeholder="Search users..."
+                   ng-focus="searchFocused = true"
+                   ng-blur="searchFocused = false"
+                   ng-class="{'selected': searchFocused}">
+
+            <input type="number"
+                   ng-model="minScore"
+                   placeholder="Min Score"
+                   ng-focus="scoreFocused = true"
+                   ng-blur="scoreFocused = false"
+                   ng-class="{'selected': scoreFocused}">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th ng-click="sortBy('id')">ID {{getSortIcon('id')}}</th>
+                    <th ng-click="sortBy('name')">Name {{getSortIcon('name')}}</th>
+                    <th ng-click="sortBy('score')">Score {{getSortIcon('score')}}</th>
+                    <th ng-click="sortBy('time')">Time {{getSortIcon('time')}}</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in users | filter:searchText | filter:scoreFilter() | orderBy:sortField:sortReverse"
+                    ng-mouseenter="user.hover = true"
+                    ng-mouseleave="user.hover = false"
+                    ng-style="{'background-color': user.hover ? '#3a3d4f' : 'inherit'}">
+                    <td>{{user.id}}</td>
+                    <td>{{ user.name.split(' ')[0] | lowercase }} {{ user.name.split(' ')[1] | uppercase }}</td>                    <td>{{user.score}}</td>
+                    <td>{{user.time}}</td>
+                    <td>{{user.date | date:'MM/dd/yyyy'}}</td>
+                    <td>{{user.price | currency}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="stats">
+            <p>Total Users: {{users.length}}</p>
+            <p>Average Score: {{getAverageScore() | number:1}}</p>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('furytypeApp', []);
+        app.controller('userCtrl', function($scope, $http) {
+            $scope.users = [];
+            $scope.sortField = 'score';
+            $scope.sortReverse = true;
+
+            $scope.loadUsers = function() {
+                $http.get('ang.json')
+                    .then(function(response) {
+                        $scope.users = response.data.users;
+                    });
+            };
+
+            $scope.sortBy = function(field) {
+                if ($scope.sortField === field) {
+                    $scope.sortReverse = !$scope.sortReverse;
+                } else {
+                    $scope.sortField = field;
+                    $scope.sortReverse = false;
+                }
+            };
+
+            $scope.getSortIcon = function(field) {
+                if ($scope.sortField === field) {
+                    return $scope.sortReverse ? '▼' : '▲';
+                }
+                return '';
+            };
+
+            $scope.scoreFilter = function() {
+                return function(user) {
+                    if (!$scope.minScore) return true;
+                    return user.score >= $scope.minScore;
+                };
+            };
+
+            $scope.getAverageScore = function() {
+                if (!$scope.users.length) return 0;
+                var total = $scope.users.reduce(function(sum, user) {
+                    return sum + user.score;
+                }, 0);
+                return total / $scope.users.length;
+            };
+        });
+    </script>
+</body>
+</html>

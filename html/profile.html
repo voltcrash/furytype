@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Profile</title>
-    <link rel="stylesheet" href="../assets/css/common_styles.css">
-    <link rel="stylesheet" href="../assets/css/specific_styles.css">
-    <script type="text/javascript" src="../js/common_scripts.js"></script>
-    <script type="text/javascript" src="../js/specific_scripts.js"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FuryType | simple and effortless typing test and practice</title>
+    <meta name="description"
+          content="FuryType offers a simple and effortless typing test and practice platform. Improve your typing speed and accuracy with engaging tools and real-time metrics. Perfect for typists of all levels!"/>
+    <meta property="og:title" content="FuryType - Typing Test & Practice for Speed and Accuracy"/>
+    <meta property="og:description"
+          content="Enhance your typing skills with FuryType! Take tests, track progress, and improve accuracy."/>
+    <meta property="og:image" content="https://furytype.pages.dev/assets/images/link_prev.jpg"/>
+    <meta property="og:url" content="https://furytype.pages.dev"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="FuryType"/>
+    <meta property="og:locale" content="en_US"/>
+
+
+    <link rel="canonical" href="https://furytype.pages.app/"/>
+    <link rel="icon" href="../assets/images/favicon/favicon.ico" type="image/x-icon"/>
+    <link rel="apple-touch-icon" href="../assets/images/favicon/apple-touch-icon.png"/>
+    <link rel="icon" sizes="192x192" href="../assets/images/favicon/android-chrome-192x192.png"/>
+    <link rel="icon" sizes="512x512" href="../assets/images/favicon/android-chrome-512x512.png"/>
+    <link rel="icon" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png"/>
+    <link rel="icon" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png"/>
+    <link rel="manifest" href="../assets/images/favicon/manifest.json" crossorigin="use-credentials"/>
+
+    <link rel="stylesheet" href="../assets/css/common_styles.css"/>
+    <link rel="stylesheet" href="../assets/css/specific_styles.css"/>
+    <script type="text/javascript" src="../js/min/common_scripts.min.js"></script>
+    <!--    <script type="text/javascript" src="js/min/specific_scripts.min.js" defer></script>-->
+    <script type="text/javascript" src="../js/specific_scripts.js" defer></script>
 </head>
 
 <body class="body">
-<!-- Header Section -->
 <header class="nav_bar">
     <nav class="nav_bar_left">
+        <img src="../assets/images/dark_icon.png" draggable="false" alt="website logo icon" class="logo-icon"
+             id="themeToggle"
+             onclick="toggle_mode()"/>
         <h1><a class="logo" href="../index.html">FuryType</a></h1>
-        <button class="theme_switch" type="button" onclick="toggle_mode();" aria-label="Toggle dark/light theme">
-            ☾ / ☼
-        </button>
     </nav>
 
     <nav class="nav_bar_right">
         <ul>
             <li><a href="https://oltt.carrd.co">About Me</a></li>
             <li><a href="../index.html">Home</a></li>
-            <li><a href="tutorial.html">Tutorial</a></li>
-            <li><a href="reg_log.html">Login/Register</a></li>
+            <li><a href="../html/tutorial.html">Tutorial</a></li>
+            <li><a href="../html/reg_log.html">Login/Register</a></li>
         </ul>
     </nav>
 </header>
@@ -39,63 +60,176 @@
 <main>
     <h2 class="main_heading">Profile</h2>
 
-    <table class="metrics">
+    <table class="metrics" id="raceTable">
         <tr class="metrics_heading">
-            <th><abbr title="Words Per Minute">wpm</abbr></th>
-            <th>raw</th>
-            <th>accuracy</th>
-            <th>consistency</th>
-            <th>chars</th>
-            <th>mode</th>
-            <th>info</th>
-            <th>date</th>
-        </tr>
-        <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+            <th>ID</th>
+            <th>WPM</th>
+            <th>Accuracy</th>
+            <th>Duration</th>
+            <th>Date</th>
+            <th>Actions</th>
         </tr>
     </table>
+
+    <!-- Search Field -->
+    <div style="display: flex; justify-content: center; align-items: center; margin: 20px auto; max-width: 500px; gap: 10px;">
+        <input type="text" id="searchDate" placeholder="Enter Date (DD/MM/YYYY)"
+               style="padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 16px; width: 220px; transition: border-color 0.3s; outline: none;">
+        <button onclick="searchRaceByDate()"
+                style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+            Search
+        </button>
+    </div>
+
 </main>
 
-<form class="return_but" action="../index.html">
-    <input type="submit" value="return">
-</form>
-</body>
+<div class="button_container">
+    <a href="../index.html" class="button">Return</a>
+</div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", fetchRaces);
+
+    // ✅ Fetch & Display Latest 10 Race Records (Latest to Oldest)
+    function fetchRaces() {
+        fetch('/get-races')
+            .then(response => response.json())
+            .then(data => {
+                const raceTable = document.getElementById('raceTable');
+                if (!raceTable) return;
+
+                raceTable.innerHTML = `
+                <tr class="metrics_heading">
+                    <th>SNo</th>
+                    <th>WPM</th>
+                    <th>Accuracy</th>
+                    <th>Duration</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>`;
+
+                data.forEach(race => {
+                    const raceSno = String(race.sno);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${raceSno}</td>
+                        <td><input type="number" value="${race.wpm}" id="wpm-${raceSno}"></td>
+                        <td><input type="text" value="${race.accuracy}" id="accuracy-${raceSno}"></td>
+                        <td>${race.duration}s</td>
+                        <td>${formatDateTime(race.dateTime)}</td>
+                        <td>
+                            <button onclick="editRace('${raceSno}')" style="padding: 6px 12px; margin: 1px 3px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; background-color: #28a745; color: white; transition: background-color 0.2s;">Edit</button>
+                            <button onclick="deleteRace('${raceSno}')" style="padding: 6px 12px; margin: 1px 3px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; background-color: #dc3545; color: white; transition: background-color 0.2s;">Delete</button>
+                        </td>`;
+                    raceTable.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching race results:', error));
+    }
+
+    function formatDateTime(isoString) {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+
+
+    // ✅ Search Race Records by Date
+    function searchRaceByDate() {
+        let searchDate = document.getElementById('searchDate').value.trim();
+
+        if (!searchDate) {
+            alert("Please enter a valid date (DD/MM/YYYY).");
+            return;
+        }
+
+        // Convert DD/MM/YYYY to YYYY-MM-DD
+        const dateParts = searchDate.split('/');
+        if (dateParts.length === 3) {
+            const day = dateParts[0];
+            const month = dateParts[1];
+            const year = dateParts[2];
+
+            if (isNaN(day) || isNaN(month) || isNaN(year) || day > 31 || month > 12) {
+                alert("Invalid date format! Use DD/MM/YYYY.");
+                return;
+            }
+
+            searchDate = `${year}-${month}-${day}`;
+        }
+
+        fetch(`/search-race/${searchDate}`)
+            .then(response => response.json())
+            .then(data => {
+                const raceTable = document.getElementById('raceTable');
+                if (!raceTable) return;
+
+                raceTable.innerHTML = `
+            <tr class="metrics_heading">
+                <th>SNo</th>
+                <th>WPM</th>
+                <th>Accuracy</th>
+                <th>Duration</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>`;
+
+                if (data.length === 0) {
+                    alert('No records found for this date.');
+                    return;
+                }
+
+                data.forEach(race => {
+                    const raceSno = String(race.sno);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${raceSno}</td>
+                        <td>${race.wpm}</td>
+                        <td>${race.accuracy}</td>
+                        <td>${race.duration}s</td>
+                        <td>${formatDate(race.dateTime)}</td>
+                        <td>
+                            <button onclick="fetchRaces()" style="padding: 6px 12px; margin: 0 3px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; background-color: #6c757d; color: white; transition: background-color 0.2s;">Back</button>
+                        </td>`;
+                    raceTable.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error searching race:', error));
+    }
+
+    // ✅ Ensure search results show dates in DD/MM/YYYY
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+
+    // ✅ Delete a Race Record
+    function deleteRace(sno) {
+        if (!confirm("Are you sure you want to delete this record?")) return;
+
+        fetch(`/delete-race/${sno}`, {method: 'DELETE'})
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchRaces(); // Refresh the table after deletion
+            })
+            .catch(error => console.error('Error deleting race result:', error));
+    }
+</script>
+
+
+</body>
 </html>

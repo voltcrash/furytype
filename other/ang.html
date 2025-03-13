@@ -24,7 +24,7 @@
             color: white;
             border-radius: 4px;
         }
-        .selected { 
+        .selected {
             background: #ff8c00;
             color: white;
         }
@@ -63,26 +63,23 @@
     <div ng-controller="userCtrl">
         <h1>Scores</h1>
 
-        <!-- Controls section using ng-click and filters -->
         <div class="controls">
             <button ng-click="loadUsers()">Load Data</button>
-            <input type="text" 
-                   ng-model="searchText" 
+            <input type="text"
+                   ng-model="searchText"
                    placeholder="Search users..."
                    ng-focus="searchFocused = true"
                    ng-blur="searchFocused = false"
                    ng-class="{'selected': searchFocused}">
-            
-            <!-- Score filter -->
-            <input type="number" 
-                   ng-model="minScore" 
+
+            <input type="number"
+                   ng-model="minScore"
                    placeholder="Min Score"
                    ng-focus="scoreFocused = true"
                    ng-blur="scoreFocused = false"
                    ng-class="{'selected': scoreFocused}">
         </div>
 
-        <!-- Table with mouse events -->
         <table>
             <thead>
                 <tr>
@@ -105,7 +102,6 @@
             </tbody>
         </table>
 
-        <!-- Stats section -->
         <div class="stats">
             <p>Total Users: {{users.length}}</p>
             <p>Average Score: {{getAverageScore() | number:1}}</p>
@@ -118,14 +114,14 @@
             $scope.users = [];
             $scope.sortField = 'score';
             $scope.sortReverse = true;
-            
+
             $scope.loadUsers = function() {
                 $http.get('ang.json')
                     .then(function(response) {
                         $scope.users = response.data.users;
                     });
             };
-            
+
             $scope.sortBy = function(field) {
                 if ($scope.sortField === field) {
                     $scope.sortReverse = !$scope.sortReverse;
