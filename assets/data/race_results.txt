@@ -94,3 +94,11 @@
     "accuracy": "95%",
     "paragraph": "Duff McKagan has been known to use a white bass with \"Solger\" written in black marker across it, to show his support for his long-time friend Paul Solger, and his battle with cancer."
 },
+{
+    "sno": 1741858097747,
+    "dateTime": "2025-03-13T09:28:17.747Z",
+    "duration": "30.00",
+    "wpm": 90,
+    "accuracy": "97",
+    "paragraph": "Yoshizawa's best performance at the World Championships came in 2004, when he placed 5th as a member of the Japanese 5000 metre relay team. He also won a bronze medal at the 2004 World Short Track Speed Skating Team Championships for Japan."
+},
