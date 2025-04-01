@@ -92,8 +92,6 @@ app.get('/search-race/:date', (req, res) => {
     });
 });
 
-
-
 // ✅ Serve index.html from root
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
