@@ -75,7 +75,7 @@ export function initializeTypingTest() {
 
 function fetchParagraphs() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/assets/data/paragraphs_small.txt", true);
+    xhr.open("GET", "/src/assets/data/paragraphs.txt", true);
     xhr.timeout = 10000; // 10 second timeout
     
     xhr.onload = function () {
