@@ -13,26 +13,55 @@ let lastCharacterTime = null;
 let currentConsistency = 100;
 let paragraphs = [];
 
+// Add fallback paragraphs
+const fallbackParagraphs = [
+    "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once.",
+    "In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole filled with the ends of worms and an oozy smell.",
+    "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness.",
+    "To be or not to be, that is the question. Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune.",
+    "Call me Ishmael. Some years ago never mind how long precisely having little or no money in my purse and nothing particular to interest me on shore."
+];
+
 function fetchParagraphs() {
-    const xhr = new XMLHttpRequest;
-    xhr.open("GET", "/assets/data/paragraphs.txt", true);
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/assets/data/paragraphs_small.txt", true);
+    xhr.timeout = 10000; // 10 second timeout
+    
     xhr.onload = function () {
         if (xhr.status === 200) {
-            paragraphs = xhr.responseText.split("\n").filter((line => line.trim() !== ""));
-            if (paragraphs.length > 0) {
-                testText = getRandomParagraph();
-                initializeTypingTest()
+            const fetchedParagraphs = xhr.responseText.split("\n").filter(line => line.trim() !== "");
+            if (fetchedParagraphs.length > 0) {
+                paragraphs = fetchedParagraphs;
+                console.log(`Loaded ${paragraphs.length} paragraphs successfully`);
             } else {
-                console.error("No paragraphs fetched")
+                console.warn("No paragraphs fetched, using fallback");
+                paragraphs = fallbackParagraphs;
             }
+            testText = getRandomParagraph();
+            initializeTypingTest();
         } else {
-            console.error("Failed to load paragraphs. Status:", xhr.status)
+            console.error("Failed to load paragraphs. Status:", xhr.status, "Using fallback paragraphs");
+            paragraphs = fallbackParagraphs;
+            testText = getRandomParagraph();
+            initializeTypingTest();
         }
     };
+    
     xhr.onerror = function () {
-        console.error("request failed")
+        console.error("Network error loading paragraphs. Using fallback paragraphs");
+        paragraphs = fallbackParagraphs;
+        testText = getRandomParagraph();
+        initializeTypingTest();
     };
-    xhr.send()
+    
+    xhr.ontimeout = function () {
+        console.error("Timeout loading paragraphs. Using fallback paragraphs");
+        paragraphs = fallbackParagraphs;
+        testText = getRandomParagraph();
+        initializeTypingTest();
+    };
+    
+    xhr.send();
 }
 
 function initializeTypingTest() {
