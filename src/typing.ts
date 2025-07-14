@@ -1,21 +1,55 @@
+// Interfaces and types
+interface Key {
+    label: string;
+    size: number;
+}
+
+interface WPMHistoryItem {
+    time: number;
+    wpm: number;
+}
+
+interface RaceData {
+    sno: number;
+    dateTime: string;
+    duration: string;
+    wpm: number;
+    accuracy: string;
+    paragraph: string;
+}
+
+interface ThemeColors {
+    keyColor: string;
+    pressedKeyColor: string;
+    incorrectKeyColor: string;
+    keyTextColor: string;
+}
+
+interface ThemeConfig {
+    dark: ThemeColors;
+    light: ThemeColors;
+}
+
+type Theme = 'dark' | 'light';
+
 // Global state variables
-let testText = "";
-let currentIndex = 0;
-let totalTime = 30;
-let timeLeft = totalTime;
-let correctChars = 0;
-let totalChars = 0;
-let timerInterval = null;
-let timerStarted = false;
-let startTime = null;
-let wpmHistory = [];
-let consistencyScores = [];
-let lastCharacterTime = null;
-let currentConsistency = 100;
-let paragraphs = [];
+let testText: string = "";
+let currentIndex: number = 0;
+let totalTime: number = 30;
+let timeLeft: number = totalTime;
+let correctChars: number = 0;
+let totalChars: number = 0;
+let timerInterval: number | null = null;
+let timerStarted: boolean = false;
+let startTime: number | null = null;
+let wpmHistory: WPMHistoryItem[] = [];
+let consistencyScores: number[] = [];
+let lastCharacterTime: number | null = null;
+let currentConsistency: number = 100;
+let paragraphs: string[] = [];
 
 // Canvas and keyboard state
-const canvas = document.getElementById("keyboardCanvas");
+const canvas = document.getElementById("keyboardCanvas") as HTMLCanvasElement;
 const ctx = canvas?.getContext("2d");
 if (canvas && ctx) {
     const scaleFactor = window.devicePixelRatio || 2;
@@ -26,7 +60,7 @@ if (canvas && ctx) {
     ctx.scale(scaleFactor, scaleFactor);
 }
 
-const keys = [[{label: "q", size: 1}, {label: "w", size: 1}, {label: "e", size: 1}, {label: "r", size: 1}, {
+const keys: Key[][] = [[{label: "q", size: 1}, {label: "w", size: 1}, {label: "e", size: 1}, {label: "r", size: 1}, {
     label: "t", size: 1
 }, {label: "y", size: 1}, {label: "u", size: 1}, {label: "i", size: 1}, {label: "o", size: 1}, {
     label: "p", size: 1
@@ -40,19 +74,18 @@ const keys = [[{label: "q", size: 1}, {label: "w", size: 1}, {label: "e", size: 
     label: "m", size: 1
 }, {label: ",", size: 1}, {label: ".", size: 1}, {label: "/", size: 1}], [{label: "space", size: 6.25}]];
 
-const keyWidth = 50;
-const keyHeight = 50;
-const keySpacing = 8;
-const startX = 20;
-const startY = 20;
-const radius = 20;
-let pressedKeys = new Set;
-let incorrectKeys = new Set;
-export let currentTheme = "dark";
-let shiftPressed = false;
+const keyWidth: number = 50;
+const keyHeight: number = 50;
+const keySpacing: number = 8;
+const startY: number = 20;
+const radius: number = 20;
+let pressedKeys: Set<string> = new Set();
+let incorrectKeys: Set<string> = new Set();
+export let currentTheme: Theme = "dark";
+let shiftPressed: boolean = false;
 
 // Add fallback paragraphs
-const fallbackParagraphs = [
+const fallbackParagraphs: string[] = [
     "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once.",
     "In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole filled with the ends of worms and an oozy smell.",
     "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness.",
@@ -61,7 +94,7 @@ const fallbackParagraphs = [
 ];
 
 // Export the main initialization function
-export function initializeTypingTest() {
+export function initializeTypingTest(): void {
     // Set up event listeners
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -73,14 +106,14 @@ export function initializeTypingTest() {
     });
 }
 
-function fetchParagraphs() {
+function fetchParagraphs(): void {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/src/assets/data/paragraphs.txt", true);
     xhr.timeout = 10000; // 10 second timeout
     
     xhr.onload = function () {
         if (xhr.status === 200) {
-            const fetchedParagraphs = xhr.responseText.split("\n").filter(line => line.trim() !== "");
+            const fetchedParagraphs = xhr.responseText.split("\n").filter((line: string) => line.trim() !== "");
             if (fetchedParagraphs.length > 0) {
                 paragraphs = fetchedParagraphs;
                 console.log(`Loaded ${paragraphs.length} paragraphs successfully`);
@@ -115,7 +148,7 @@ function fetchParagraphs() {
     xhr.send();
 }
 
-function initializeTypingTestUI() {
+function initializeTypingTestUI(): void {
     currentIndex = 0;
     correctChars = 0;
     totalChars = 0;
@@ -126,109 +159,108 @@ function initializeTypingTestUI() {
     startTime = null;
     lastCharacterTime = null;
     currentConsistency = 100;
-    const timeBar = document.getElementById("timeBar");
+    const timeBar = document.getElementById("timeBar") as HTMLElement;
     timeBar.style.visibility = "hidden";
     timeBar.style.width = "100%";
-    const typeTest = document.getElementById("typeTest");
+    const typeTest = document.getElementById("typeTest") as HTMLElement;
     typeTest.innerHTML = "";
-    testText.split("").forEach((char => {
+    testText.split("").forEach((char: string) => {
         const span = document.createElement("span");
         span.textContent = char;
         span.classList.add("untyped");
-        typeTest.appendChild(span)
-    }));
+        typeTest.appendChild(span);
+    });
     const caret = document.createElement("div");
     caret.classList.add("caret");
     typeTest.appendChild(caret);
-    updateCaretPosition(caret, typeTest.querySelector("span.untyped"));
+    updateCaretPosition(caret, typeTest.querySelector("span.untyped") as HTMLSpanElement);
     const typingMetrics = document.createElement("div");
     typingMetrics.id = "typingMetrics";
-    typingMetrics.innerHTML = `\n        <span id="wpm">0wpm</span> <span id="accuracy">0%acc</span>  <span id="rawWpm">0raw</span>\n    `;
+    typingMetrics.innerHTML = `
+        <span id="wpm">0wpm</span> <span id="accuracy">0%acc</span>  <span id="rawWpm">0raw</span>
+    `;
     typingMetrics.style.position = "absolute";
     typingMetrics.style.top = "-55px";
     typingMetrics.style.left = "0";
     typeTest.appendChild(typingMetrics);
     typingMetrics.classList.remove("visible");
     document.removeEventListener("keydown", handleTyping);
-    document.addEventListener("keydown", handleTyping)
+    document.addEventListener("keydown", handleTyping);
 }
 
-function getRandomParagraph() {
+function getRandomParagraph(): string {
     if (paragraphs.length === 0) return "";
     const randomIndex = Math.floor(Math.random() * paragraphs.length);
-    return paragraphs[randomIndex]
+    return paragraphs[randomIndex];
 }
 
-const highlightTimeouts = {};
-const keyStates = {};
-let lastKey = null;
-let longPressHandled = false;
-let pressedKey = null;
+const highlightTimeouts: Record<string, number> = {};
+let pressedKey: string | null = null;
 
-function handleTyping(event) {
+function handleTyping(event: KeyboardEvent): void {
     const validKeyRegex = /^[a-zA-Z0-9 .,;'/[\]\\\-_=+{}|:>?<()*&^!@#$%~`]$/;
     const typedChar = event.key;
     if (!validKeyRegex.test(typedChar) && event.key !== "Backspace" || event.metaKey) {
-        return
+        return;
     }
     if (typedChar === pressedKey) {
-        return
+        return;
     }
     pressedKey = typedChar;
     if (!timerStarted && validKeyRegex.test(typedChar) && typedChar !== " " && typedChar !== "Backspace") {
         startTimer();
         timerStarted = true;
-        startTime = (new Date).getTime();
-        lastCharacterTime = (new Date).getTime();
-        const timeBar = document.getElementById("timeBar");
+        startTime = (new Date()).getTime();
+        lastCharacterTime = (new Date()).getTime();
+        const timeBar = document.getElementById("timeBar") as HTMLElement;
         timeBar.style.visibility = "visible";
-        startMetricUpdater()
+        startMetricUpdater();
     }
-    const typeTest = document.getElementById("typeTest");
-    const spans = typeTest.querySelectorAll("span");
-    const caret = typeTest.querySelector(".caret");
+    const typeTest = document.getElementById("typeTest") as HTMLElement;
+    const spans = typeTest.querySelectorAll("span") as NodeListOf<HTMLSpanElement>;
+    const caret = typeTest.querySelector(".caret") as HTMLElement;
     if (typedChar === "Backspace") {
         if (event.ctrlKey || event.altKey || event.metaKey) {
-            deletePreviousWord(spans, caret)
+            deletePreviousWord(spans, caret);
         } else if (currentIndex > 0) {
             currentIndex--;
             spans[currentIndex].classList.remove("correct", "incorrect");
             spans[currentIndex].classList.add("untyped");
             if (caret && spans[currentIndex]) {
-                updateCaretPosition(caret, spans[currentIndex])
+                updateCaretPosition(caret, spans[currentIndex]);
             }
         }
-        return
+        return;
     }
     if (currentIndex >= testText.length) return;
     totalChars++;
 
-    function highlightKey(key, isCorrect) {
+    function highlightKey(key: string, isCorrect: boolean): void {
         const normalizedKey = key.toLowerCase();
-        const keyMap = {" ": "space", ".": ".", ",": ",", ";": ";", "'": "'", "/": "/", "[": "[", "]": "]"};
+        const keyMap: Record<string, string> = {" ": "space", ".": ".", ",": ",", ";": ";", "'": "'", "/": "/", "[": "[", "]": "]"};
         const displayKey = keyMap[normalizedKey] || normalizedKey;
         if (highlightTimeouts[displayKey]) {
             clearTimeout(highlightTimeouts[displayKey]);
-            delete highlightTimeouts[displayKey]
+            delete highlightTimeouts[displayKey];
         }
         if (!isCorrect) {
             incorrectKeys.add(displayKey);
-            pressedKeys.delete(displayKey)
+            pressedKeys.delete(displayKey);
         } else {
             if (!incorrectKeys.has(displayKey)) {
-                pressedKeys.add(displayKey)
+                pressedKeys.add(displayKey);
             }
         }
         drawKeyboard(currentTheme);
-        highlightTimeouts[displayKey] = setTimeout((() => {
+        highlightTimeouts[displayKey] = setTimeout(() => {
             if (isCorrect) {
-                pressedKeys.delete(displayKey)
+                pressedKeys.delete(displayKey);
             } else {
-                incorrectKeys.delete(displayKey)
+                incorrectKeys.delete(displayKey);
             }
             delete highlightTimeouts[displayKey];
-            drawKeyboard(currentTheme)
-        }), 175)
+            drawKeyboard(currentTheme);
+        }, 175);
     }
 
     const currentChar = testText[currentIndex];
@@ -236,91 +268,91 @@ function handleTyping(event) {
         correctChars++;
         spans[currentIndex].classList.replace("untyped", "correct");
         highlightKey(typedChar, true);
-        currentIndex++
+        currentIndex++;
     } else if (typedChar.length === 1) {
         spans[currentIndex].classList.replace("untyped", "incorrect");
         highlightKey(typedChar, false);
-        currentIndex++
+        currentIndex++;
     }
     if (currentIndex < testText.length) {
         if (caret && spans[currentIndex]) {
-            updateCaretPosition(caret, spans[currentIndex])
+            updateCaretPosition(caret, spans[currentIndex]);
         }
     } else if (currentIndex === testText.length) {
-        endTypingTest()
+        endTypingTest();
     }
     if (startTime) {
-        const now = (new Date).getTime();
-        const elapsedTime = (now - startTime) / 1e3;
+        const now = (new Date()).getTime();
+        const elapsedTime = (now - startTime) / 1000;
         const wpm = calculateWPM(correctChars, elapsedTime);
         wpmHistory.push({time: totalTime - timeLeft, wpm: wpm});
         if (lastCharacterTime) {
-            const timeSinceLastChar = (now - lastCharacterTime) / 1e3;
+            const timeSinceLastChar = (now - lastCharacterTime) / 1000;
             consistencyScores.push(timeSinceLastChar);
-            currentConsistency = calculateConsistency()
+            currentConsistency = calculateConsistency();
         }
-        lastCharacterTime = now
+        lastCharacterTime = now;
     }
 }
 
-function deletePreviousWord(spans, caret) {
+function deletePreviousWord(spans: NodeListOf<HTMLSpanElement>, caret: HTMLElement): void {
     if (currentIndex <= 0) return;
     let initialIndex = currentIndex;
     while (currentIndex > 0 && testText[currentIndex - 1] === " ") {
-        currentIndex--
+        currentIndex--;
     }
     while (currentIndex > 0 && testText[currentIndex - 1] !== " ") {
-        currentIndex--
+        currentIndex--;
     }
     for (let i = initialIndex - 1; i >= currentIndex; i--) {
         spans[i].classList.remove("correct", "incorrect");
-        spans[i].classList.add("untyped")
+        spans[i].classList.add("untyped");
     }
     if (caret && spans[currentIndex]) {
-        updateCaretPosition(caret, spans[currentIndex])
+        updateCaretPosition(caret, spans[currentIndex]);
     }
 }
 
-document.addEventListener("keyup", (event => {
+document.addEventListener("keyup", (event: KeyboardEvent) => {
     if (event.key === pressedKey) {
-        pressedKey = null
+        pressedKey = null;
     }
-}));
+});
 
-function startTimer() {
-    const timeBar = document.getElementById("timeBar");
+function startTimer(): void {
+    const timeBar = document.getElementById("timeBar") as HTMLElement;
     timeBar.style.visibility = "visible";
-    timerInterval = setInterval((() => {
+    timerInterval = window.setInterval(() => {
         timeLeft--;
         const progress = timeLeft / totalTime * 100;
         timeBar.style.width = `${progress}%`;
         if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            endTypingTest()
+            clearInterval(timerInterval!);
+            endTypingTest();
         }
-    }), 1e3)
+    }, 1000);
 }
 
-function updateCaretPosition(caret, targetSpan) {
+function updateCaretPosition(caret: HTMLElement, targetSpan: HTMLSpanElement): void {
     if (caret && targetSpan) {
         caret.style.left = `${targetSpan.offsetLeft}px`;
-        caret.style.top = `${targetSpan.offsetTop + 2.5}px`
+        caret.style.top = `${targetSpan.offsetTop + 2.5}px`;
     }
 }
 
-function calculateWPM(correctChars, elapsedTime) {
+function calculateWPM(correctChars: number, elapsedTime: number): number {
     if (elapsedTime <= 0 || correctChars === 0) return 0;
     const wordsTyped = Math.floor(correctChars / 5);
-    return Math.round(wordsTyped / (elapsedTime / 60))
+    return Math.round(wordsTyped / (elapsedTime / 60));
 }
 
-function calculateAccuracy(correctChars, totalChars) {
+function calculateAccuracy(correctChars: number, totalChars: number): number {
     if (totalChars === 0) return 100;
-    return Math.round(correctChars / totalChars * 100)
+    return Math.round(correctChars / totalChars * 100);
 }
 
-function updateMetrics(wpm, accuracy, rawWpm) {
-    let typingMetrics = document.getElementById("typingMetrics");
+function updateMetrics(wpm: number, accuracy: number, rawWpm: number): void {
+    let typingMetrics = document.getElementById("typingMetrics") as HTMLElement;
     if (!typingMetrics) {
         typingMetrics = document.createElement("div");
         typingMetrics.id = "typingMetrics";
@@ -328,38 +360,40 @@ function updateMetrics(wpm, accuracy, rawWpm) {
         typingMetrics.style.top = "-55px";
         typingMetrics.style.left = "0";
         const typeTest = document.getElementById("typeTest");
-        if (typeTest) typeTest.appendChild(typingMetrics)
+        if (typeTest) typeTest.appendChild(typingMetrics);
     }
     if (!typingMetrics.classList.contains("visible")) {
-        typingMetrics.classList.add("visible")
+        typingMetrics.classList.add("visible");
     }
-    typingMetrics.innerHTML = `\n        <span id="wpm">${wpm}wpm</span> <span id="accuracy">${accuracy}%acc</span> <span id="rawWpm">${rawWpm}raw</span>\n    `
+    typingMetrics.innerHTML = `
+        <span id="wpm">${wpm}wpm</span> <span id="accuracy">${accuracy}%acc</span> <span id="rawWpm">${rawWpm}raw</span>
+    `;
 }
 
-let metricUpdaterInterval = null;
+let metricUpdaterInterval: number | null = null;
 
-function startMetricUpdater() {
-    metricUpdaterInterval = setInterval((() => {
+function startMetricUpdater(): void {
+    metricUpdaterInterval = window.setInterval(() => {
         if (startTime) {
-            const elapsedTime = ((new Date).getTime() - startTime) / 1e3;
+            const elapsedTime = ((new Date()).getTime() - startTime) / 1000;
             const wpm = calculateWPM(correctChars, elapsedTime);
             const accuracy = calculateAccuracy(correctChars, totalChars);
-            const rawWpm = Math.round(totalChars / elapsedTime * 60 * .2);
-            updateMetrics(wpm, accuracy, rawWpm)
+            const rawWpm = Math.round(totalChars / elapsedTime * 60 * 0.2);
+            updateMetrics(wpm, accuracy, rawWpm);
         }
-    }), 100)
+    }, 100);
 }
 
-function endTypingTest() {
-    clearInterval(timerInterval);
-    clearInterval(metricUpdaterInterval);
+function endTypingTest(): void {
+    clearInterval(timerInterval!);
+    clearInterval(metricUpdaterInterval!);
 
     const typeTest = document.getElementById('typeTest');
     if (typeTest) {
         typeTest.style.display = 'none';
     }
 
-    let resultScreen = document.getElementById('resultScreen');
+    let resultScreen = document.getElementById('resultScreen') as HTMLElement;
     if (!resultScreen) {
         resultScreen = document.createElement('div');
         resultScreen.id = 'resultScreen';
@@ -374,10 +408,10 @@ function endTypingTest() {
     const numCorrect = correctChars;
     const numIncorrect = totalChars - correctChars;
     const numUntyped = testText.length - totalChars;
-    const rawWpm = Math.round(totalChars / resultTime * 60 * .2).toFixed(2);
+    const rawWpm = Math.round(totalChars / resultTime * 60 * 0.2).toFixed(2);
     currentConsistency = calculateConsistency();
 
-    const raceData = {
+    const raceData: RaceData = {
         sno: new Date().getTime(), // Unique serial number (timestamp)
         dateTime: new Date().toISOString(),
         duration: `${resultTime.toFixed(2)}`,
@@ -389,19 +423,45 @@ function endTypingTest() {
     // Send race data to the server
     sendRaceData(raceData);
 
-    resultScreen.innerHTML = `\n         <h2>test complete</h2>\n        <div class="main-result">\n                ${wpm}<span>wpm</span> | ${accuracy}<span>%acc</span>\n          </div>\n        <div class="metrics-container">\n            <div class="metric">\n                raw\n                <span>${rawWpm}</span>\n            </div>\n             <div class="metric">\n                characters\n                <span>${numCorrect}/${numIncorrect}/${numUntyped}</span>\n            </div>\n             <div class="metric">\n                consistency\n                <span>${currentConsistency.toFixed(2)}%</span>\n            </div>\n             <div class="metric">\n                time\n                <span>${resultTime.toFixed(2)}s</span>\n            </div>\n             <canvas id="resultGraph"></canvas>\n\n        </div>\n         <button class="retry-button">></button>\n    `;
+    resultScreen.innerHTML = `
+         <h2>test complete</h2>
+        <div class="main-result">
+                ${wpm}<span>wpm</span> | ${accuracy}<span>%acc</span>
+          </div>
+        <div class="metrics-container">
+            <div class="metric">
+                raw
+                <span>${rawWpm}</span>
+            </div>
+             <div class="metric">
+                characters
+                <span>${numCorrect}/${numIncorrect}/${numUntyped}</span>
+            </div>
+             <div class="metric">
+                consistency
+                <span>${currentConsistency.toFixed(2)}%</span>
+            </div>
+             <div class="metric">
+                time
+                <span>${resultTime.toFixed(2)}s</span>
+            </div>
+             <canvas id="resultGraph"></canvas>
+
+        </div>
+         <button class="retry-button">></button>
+    `;
     drawGraph();
 
 
-    const tryAgainButton = document.querySelector('.retry-button');
+    const tryAgainButton = document.querySelector('.retry-button') as HTMLButtonElement;
     tryAgainButton.addEventListener('click', resetTestState);
     const typingMetrics = document.getElementById("typingMetrics");
     if (typingMetrics) {
-        typingMetrics.remove()
+        typingMetrics.remove();
     }
 }
 
-function sendRaceData(raceData) {
+function sendRaceData(raceData: RaceData): void {
     fetch('/record-race', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
@@ -416,24 +476,24 @@ function sendRaceData(raceData) {
         });
 }
 
-function calculateConsistency() {
+function calculateConsistency(): number {
     if (consistencyScores.length < 2) return 100;
     let averageConsistencyDifference = 0;
     for (let i = 1; i < consistencyScores.length; i++) {
         const currentChange = Math.abs(consistencyScores[i] - consistencyScores[i - 1]);
-        averageConsistencyDifference = averageConsistencyDifference * .9 + currentChange * .1
+        averageConsistencyDifference = averageConsistencyDifference * 0.9 + currentChange * 0.1;
     }
     const standardPercentage = Math.max(0, 100 - averageConsistencyDifference * 200);
-    let modifiedPercentage;
+    let modifiedPercentage: number;
     if (standardPercentage < 20) {
-        modifiedPercentage = Math.round(standardPercentage * .4)
+        modifiedPercentage = Math.round(standardPercentage * 0.4);
     } else {
-        modifiedPercentage = Math.round(standardPercentage)
+        modifiedPercentage = Math.round(standardPercentage);
     }
-    return Math.max(0, Math.min(100, modifiedPercentage))
+    return Math.max(0, Math.min(100, modifiedPercentage));
 }
 
-function resetTestState() {
+function resetTestState(): void {
     try {
         console.log("Resetting test state...");
         currentIndex = 0;
@@ -447,42 +507,42 @@ function resetTestState() {
         currentConsistency = 100;
         if (timerInterval) {
             clearInterval(timerInterval);
-            timerInterval = null
+            timerInterval = null;
         }
         if (metricUpdaterInterval) {
             clearInterval(metricUpdaterInterval);
-            metricUpdaterInterval = null
+            metricUpdaterInterval = null;
         }
-        const resultScreen = document.getElementById("resultScreen");
+        const resultScreen = document.getElementById("resultScreen") as HTMLElement;
         if (resultScreen) {
             resultScreen.classList.add("fadeOut");
-            resultScreen.addEventListener("animationend", (() => {
+            resultScreen.addEventListener("animationend", () => {
                 if (resultScreen.parentNode) {
-                    resultScreen.remove()
+                    resultScreen.remove();
                 }
-            }), {once: true})
+            }, {once: true});
         }
-        const typeTest = document.getElementById("typeTest");
+        const typeTest = document.getElementById("typeTest") as HTMLElement;
         if (typeTest) {
-            typeTest.style.display = "block"
+            typeTest.style.display = "block";
         }
         testText = getRandomParagraph();
         initializeTypingTestUI();
-        console.log("Test state reset successfully.")
+        console.log("Test state reset successfully.");
     } catch (error) {
-        console.error("Error resetting test state:", error)
+        console.error("Error resetting test state:", error);
     }
 }
 
 // Export the drawKeyboard function for use in animation.js
-export function drawKeyboard(theme) {
+export function drawKeyboard(theme: Theme): void {
     currentTheme = theme; // Update the current theme
     
     if (!canvas || !ctx) return;
     
-    document.fonts.ready.then((() => {
+    document.fonts.ready.then(() => {
         ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 2), canvas.height / (window.devicePixelRatio || 2));
-        const themeColors = {
+        const themeColors: ThemeConfig = {
             dark: {
                 keyColor: "rgb(46,52,64)",
                 pressedKeyColor: "rgb(136,192,208)",
@@ -496,14 +556,14 @@ export function drawKeyboard(theme) {
             }
         };
         let y = startY;
-        keys.forEach((row => {
+        keys.forEach((row: Key[]) => {
             let totalRowWidth = 0;
-            row.forEach((({label: label, size: size}) => {
-                totalRowWidth += keyWidth * size + keySpacing
-            }));
+            row.forEach(({size}: Key) => {
+                totalRowWidth += keyWidth * size + keySpacing;
+            });
             totalRowWidth -= keySpacing;
             let x = (canvas.width / (window.devicePixelRatio || 2) - totalRowWidth) / 2;
-            row.forEach((({label: label, size: size}) => {
+            row.forEach(({label, size}: Key) => {
                 const width = keyWidth * size;
                 const height = keyHeight;
                 const keyColor = themeColors[theme].keyColor;
@@ -512,9 +572,9 @@ export function drawKeyboard(theme) {
                 const keyTextColor = themeColors[theme].keyTextColor;
                 let keyFillColor = keyColor;
                 if (incorrectKeys.has(label)) {
-                    keyFillColor = incorrectKeyColor
+                    keyFillColor = incorrectKeyColor;
                 } else if (pressedKeys.has(label)) {
-                    keyFillColor = pressedKeyColor
+                    keyFillColor = pressedKeyColor;
                 }
                 ctx.fillStyle = keyFillColor;
                 ctx.beginPath();
@@ -527,52 +587,53 @@ export function drawKeyboard(theme) {
                 ctx.textBaseline = "middle";
                 const displayLabel = shiftPressed ? label.toUpperCase() : label;
                 ctx.fillText(displayLabel, x + width / 2, y + keyHeight / 2);
-                x += width + keySpacing
-            }));
-            y += keyHeight + keySpacing
-        }))
-    }))
+                x += width + keySpacing;
+            });
+            y += keyHeight + keySpacing;
+        });
+    });
 }
 
 // Export function to update theme from animation module
-export function updateTheme(theme) {
+export function updateTheme(theme: Theme): void {
     drawKeyboard(theme);
 }
 
-function handleKeyDown(event) {
+function handleKeyDown(event: KeyboardEvent): void {
     let key = event.key.toLowerCase();
     if (key === " ") key = "space";
     if (event.key === "Shift") {
         shiftPressed = true;
-        drawKeyboard(currentTheme)
+        drawKeyboard(currentTheme);
     }
 }
 
-function handleKeyUp(event) {
+function handleKeyUp(event: KeyboardEvent): void {
     let key = event.key.toLowerCase();
     if (key === " ") key = "space";
     if (event.key === "Shift") {
         shiftPressed = false;
-        drawKeyboard(currentTheme)
+        drawKeyboard(currentTheme);
     }
 }
 
-function showPopup(event, text) {
-    const popup = document.getElementById("popup");
-    popup.style.left = `${event.pageX + 10}px`;
-    popup.style.top = `${event.pageY + 10}px`;
-    popup.textContent = text;
-    popup.style.display = "block"
-}
+// Commented out unused functions - keeping them for potential future use
+// function showPopup(event: MouseEvent, text: string): void {
+//     const popup = document.getElementById("popup") as HTMLElement;
+//     popup.style.left = `${event.pageX + 10}px`;
+//     popup.style.top = `${event.pageY + 10}px`;
+//     popup.textContent = text;
+//     popup.style.display = "block";
+// }
 
-function hidePopup() {
-    const popup = document.getElementById("popup");
-    popup.style.display = "none"
-}
+// function hidePopup(): void {
+//     const popup = document.getElementById("popup") as HTMLElement;
+//     popup.style.display = "none";
+// }
 
-function drawGraph() {
-    const graphCanvas = document.getElementById("resultGraph");
-    const ctx = graphCanvas.getContext("2d");
+function drawGraph(): void {
+    const graphCanvas = document.getElementById("resultGraph") as HTMLCanvasElement;
+    const ctx = graphCanvas.getContext("2d")!;
     const scaleFactor = window.devicePixelRatio || 2;
     graphCanvas.width = 500 * scaleFactor;
     graphCanvas.height = 150 * scaleFactor;
@@ -583,17 +644,15 @@ function drawGraph() {
     const graphWidth = graphCanvas.width / scaleFactor - 2 * padding;
     const graphHeight = graphCanvas.height / scaleFactor - 2 * padding;
     if (wpmHistory.length === 0) return;
-    const maxWpm = Math.max(...wpmHistory.map((item => item.wpm)), 10);
-    const startTime = wpmHistory[0].time;
-    const endTime = wpmHistory[wpmHistory.length - 1].time;
-    const themeColors = {
+    const maxWpm = Math.max(...wpmHistory.map((item: WPMHistoryItem) => item.wpm), 10);
+    const themeColors: ThemeConfig = {
         dark: {graphBackgroundColor: "rgb(36,41,51)", graphLineColor: "rgb(136,192,208)"},
         light: {graphBackgroundColor: "rgb(235,239,243)", graphLineColor: "rgb(121,163,162)"}
-    };
-    ctx.fillStyle = themeColors[currentTheme].graphBackgroundColor;
+    } as any;
+    ctx.fillStyle = (themeColors[currentTheme] as any).graphBackgroundColor;
     ctx.fillRect(0, 0, graphCanvas.width / scaleFactor, graphCanvas.height / scaleFactor);
     ctx.beginPath();
-    ctx.strokeStyle = themeColors[currentTheme].graphLineColor;
+    ctx.strokeStyle = (themeColors[currentTheme] as any).graphLineColor;
     ctx.lineWidth = 2;
     const xIncrement = graphWidth / (wpmHistory.length - 1);
     let x = padding;
@@ -601,7 +660,7 @@ function drawGraph() {
     for (let i = 1; i < wpmHistory.length; i++) {
         const y = graphHeight - wpmHistory[i].wpm / maxWpm * graphHeight + padding;
         ctx.lineTo(x, y);
-        x += xIncrement
+        x += xIncrement;
     }
-    ctx.stroke()
-}
+    ctx.stroke();
+} 

@@ -1,24 +1,24 @@
 // Initialize animation when called from main
-export function initializeAnimation() {
+export function initializeAnimation(): void {
     document.body.offsetHeight;
     startPageAnimation();
 
-    const logoIcon = document.getElementById("themeToggle");
+    const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
     let currentRotation = parseInt(logoIcon.getAttribute("data-rotation") || "0");
 
     if (isNaN(currentRotation) || currentRotation === 0) {
         currentRotation = 405;
         logoIcon.style.transform = `rotate(${currentRotation}deg)`;
-        logoIcon.setAttribute("data-rotation", currentRotation);
+        logoIcon.setAttribute("data-rotation", currentRotation.toString());
     }
 }
 
 // Page Animation
-function startPageAnimation() {
-    const body = document.querySelector("body");
-    const logoIcon = document.getElementById("themeToggle");
-    const mainContent = document.querySelector("main");
-    const header = document.querySelector("header");
+function startPageAnimation(): void {
+    const body = document.querySelector("body") as HTMLBodyElement;
+    const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
+    const mainContent = document.querySelector("main") as HTMLElement;
+    const header = document.querySelector("header") as HTMLElement;
     body.style.opacity = "0";
 
     setTimeout(() => {
@@ -49,10 +49,10 @@ function startPageAnimation() {
 }
 
 // Theme Toggle - exported for global use
-export function toggle_mode() {
-    const bodyElement = document.getElementsByTagName("body")[0];
-    const logoIcon = document.getElementById("themeToggle");
-    const linkElements = document.querySelectorAll("a");
+export function toggle_mode(): void {
+    const bodyElement = document.getElementsByTagName("body")[0] as HTMLBodyElement;
+    const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
+    const linkElements = document.querySelectorAll("a") as NodeListOf<HTMLAnchorElement>;
 
     let currentRotation = parseInt(logoIcon.getAttribute('data-rotation') || '0');
     currentRotation += 360;
@@ -62,15 +62,15 @@ export function toggle_mode() {
 
     logoIcon.style.transition = "transform 0.3s ease-in-out";
     logoIcon.style.transform = `rotate(${currentRotation}deg)`;
-    logoIcon.setAttribute('data-rotation', currentRotation);
+    logoIcon.setAttribute('data-rotation', currentRotation.toString());
 
-    let newTheme;
+    let newTheme: string;
     if (bodyElement.classList.contains("body2")) {
         bodyElement.classList.remove("body2");
         bodyElement.classList.add("body");
         logoIcon.src = darkIcon;
 
-        linkElements.forEach(link => {
+        linkElements.forEach((link: HTMLAnchorElement) => {
             link.classList.add("dark-mode-link");
             link.classList.remove("light-mode-link");
         });
@@ -81,7 +81,7 @@ export function toggle_mode() {
         bodyElement.classList.add("body2");
         logoIcon.src = lightIcon;
 
-        linkElements.forEach(link => {
+        linkElements.forEach((link: HTMLAnchorElement) => {
             link.classList.add("light-mode-link");
             link.classList.remove("dark-mode-link");
         });
@@ -90,8 +90,8 @@ export function toggle_mode() {
     }
 
     // Update the theme in typing module and redraw keyboard
-    if (typeof window.updateTheme === 'function') {
-        window.updateTheme(newTheme);
+    if (typeof (window as any).updateTheme === 'function') {
+        (window as any).updateTheme(newTheme);
     }
 }
 
@@ -197,4 +197,4 @@ export function toggle_mode() {
 //       transition: opacity 0.5s ease-in;
 //   }
 // `;
-// document.head.appendChild(style);
+// document.head.appendChild(style); 

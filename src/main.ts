@@ -5,6 +5,14 @@ import './styles.css';
 import { initializeAnimation, toggle_mode } from './animation.js';
 import { initializeTypingTest, updateTheme } from './typing.js';
 
+// Extend window interface for global functions
+declare global {
+    interface Window {
+        toggle_mode: () => void;
+        updateTheme: (theme: 'dark' | 'light') => void;
+    }
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     initializeAnimation();
