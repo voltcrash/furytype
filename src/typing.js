@@ -15,7 +15,7 @@ let paragraphs = [];
 
 function fetchParagraphs() {
     const xhr = new XMLHttpRequest;
-    xhr.open("GET", "/src/assets/data/paragraphs.txt", true);
+    xhr.open("GET", "/assets/data/paragraphs.txt", true);
     xhr.onload = function () {
         if (xhr.status === 200) {
             paragraphs = xhr.responseText.split("\n").filter((line => line.trim() !== ""));
