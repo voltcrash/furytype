@@ -1,3 +1,4 @@
+// Global state variables
 let testText = "";
 let currentIndex = 0;
 let totalTime = 30;
@@ -13,6 +14,43 @@ let lastCharacterTime = null;
 let currentConsistency = 100;
 let paragraphs = [];
 
+// Canvas and keyboard state
+const canvas = document.getElementById("keyboardCanvas");
+const ctx = canvas?.getContext("2d");
+if (canvas && ctx) {
+    const scaleFactor = window.devicePixelRatio || 2;
+    canvas.width = 750 * scaleFactor;
+    canvas.height = 250 * scaleFactor;
+    canvas.style.width = "750px";
+    canvas.style.height = "250px";
+    ctx.scale(scaleFactor, scaleFactor);
+}
+
+const keys = [[{label: "q", size: 1}, {label: "w", size: 1}, {label: "e", size: 1}, {label: "r", size: 1}, {
+    label: "t", size: 1
+}, {label: "y", size: 1}, {label: "u", size: 1}, {label: "i", size: 1}, {label: "o", size: 1}, {
+    label: "p", size: 1
+}, {label: "[", size: 1}, {label: "]", size: 1}], [{label: "a", size: 1}, {label: "s", size: 1}, {
+    label: "d", size: 1
+}, {label: "f", size: 1}, {label: "g", size: 1}, {label: "h", size: 1}, {label: "j", size: 1}, {
+    label: "k", size: 1
+}, {label: "l", size: 1}, {label: ";", size: 1}, {label: "'", size: 1}], [{label: "z", size: 1}, {
+    label: "x", size: 1
+}, {label: "c", size: 1}, {label: "v", size: 1}, {label: "b", size: 1}, {label: "n", size: 1}, {
+    label: "m", size: 1
+}, {label: ",", size: 1}, {label: ".", size: 1}, {label: "/", size: 1}], [{label: "space", size: 6.25}]];
+
+const keyWidth = 50;
+const keyHeight = 50;
+const keySpacing = 8;
+const startX = 20;
+const startY = 20;
+const radius = 20;
+let pressedKeys = new Set;
+let incorrectKeys = new Set;
+export let currentTheme = "dark";
+let shiftPressed = false;
+
 // Add fallback paragraphs
 const fallbackParagraphs = [
     "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once.",
@@ -21,6 +59,19 @@ const fallbackParagraphs = [
     "To be or not to be, that is the question. Whether tis nobler in the mind to suffer the slings and arrows of outrageous fortune.",
     "Call me Ishmael. Some years ago never mind how long precisely having little or no money in my purse and nothing particular to interest me on shore."
 ];
+
+// Export the main initialization function
+export function initializeTypingTest() {
+    // Set up event listeners
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    
+    // Initialize when fonts are ready
+    document.fonts.ready.then(() => {
+        fetchParagraphs();
+        drawKeyboard(currentTheme);
+    });
+}
 
 function fetchParagraphs() {
     const xhr = new XMLHttpRequest();
@@ -38,12 +89,12 @@ function fetchParagraphs() {
                 paragraphs = fallbackParagraphs;
             }
             testText = getRandomParagraph();
-            initializeTypingTest();
+            initializeTypingTestUI();
         } else {
             console.error("Failed to load paragraphs. Status:", xhr.status, "Using fallback paragraphs");
             paragraphs = fallbackParagraphs;
             testText = getRandomParagraph();
-            initializeTypingTest();
+            initializeTypingTestUI();
         }
     };
     
@@ -51,20 +102,20 @@ function fetchParagraphs() {
         console.error("Network error loading paragraphs. Using fallback paragraphs");
         paragraphs = fallbackParagraphs;
         testText = getRandomParagraph();
-        initializeTypingTest();
+        initializeTypingTestUI();
     };
     
     xhr.ontimeout = function () {
         console.error("Timeout loading paragraphs. Using fallback paragraphs");
         paragraphs = fallbackParagraphs;
         testText = getRandomParagraph();
-        initializeTypingTest();
+        initializeTypingTestUI();
     };
     
     xhr.send();
 }
 
-function initializeTypingTest() {
+function initializeTypingTestUI() {
     currentIndex = 0;
     correctChars = 0;
     totalChars = 0;
@@ -416,48 +467,21 @@ function resetTestState() {
             typeTest.style.display = "block"
         }
         testText = getRandomParagraph();
-        initializeTypingTest();
+        initializeTypingTestUI();
         console.log("Test state reset successfully.")
     } catch (error) {
         console.error("Error resetting test state:", error)
     }
 }
 
-const canvas = document.getElementById("keyboardCanvas");
-const ctx = canvas.getContext("2d");
-const scaleFactor = window.devicePixelRatio || 2;
-canvas.width = 750 * scaleFactor;
-canvas.height = 250 * scaleFactor;
-canvas.style.width = "750px";
-canvas.style.height = "250px";
-ctx.scale(scaleFactor, scaleFactor);
-const keys = [[{label: "q", size: 1}, {label: "w", size: 1}, {label: "e", size: 1}, {label: "r", size: 1}, {
-    label: "t", size: 1
-}, {label: "y", size: 1}, {label: "u", size: 1}, {label: "i", size: 1}, {label: "o", size: 1}, {
-    label: "p", size: 1
-}, {label: "[", size: 1}, {label: "]", size: 1}], [{label: "a", size: 1}, {label: "s", size: 1}, {
-    label: "d", size: 1
-}, {label: "f", size: 1}, {label: "g", size: 1}, {label: "h", size: 1}, {label: "j", size: 1}, {
-    label: "k", size: 1
-}, {label: "l", size: 1}, {label: ";", size: 1}, {label: "'", size: 1}], [{label: "z", size: 1}, {
-    label: "x", size: 1
-}, {label: "c", size: 1}, {label: "v", size: 1}, {label: "b", size: 1}, {label: "n", size: 1}, {
-    label: "m", size: 1
-}, {label: ",", size: 1}, {label: ".", size: 1}, {label: "/", size: 1}], [{label: "space", size: 6.25}]];
-const keyWidth = 50;
-const keyHeight = 50;
-const keySpacing = 8;
-const startX = 20;
-const startY = 20;
-const radius = 20;
-let pressedKeys = new Set;
-let incorrectKeys = new Set;
-let currentTheme = "dark";
-let shiftPressed = false;
-
-function drawKeyboard(theme) {
+// Export the drawKeyboard function for use in animation.js
+export function drawKeyboard(theme) {
+    currentTheme = theme; // Update the current theme
+    
+    if (!canvas || !ctx) return;
+    
     document.fonts.ready.then((() => {
-        ctx.clearRect(0, 0, canvas.width / scaleFactor, canvas.height / scaleFactor);
+        ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 2), canvas.height / (window.devicePixelRatio || 2));
         const themeColors = {
             dark: {
                 keyColor: "rgb(46,52,64)",
@@ -478,7 +502,7 @@ function drawKeyboard(theme) {
                 totalRowWidth += keyWidth * size + keySpacing
             }));
             totalRowWidth -= keySpacing;
-            let x = (canvas.width / scaleFactor - totalRowWidth) / 2;
+            let x = (canvas.width / (window.devicePixelRatio || 2) - totalRowWidth) / 2;
             row.forEach((({label: label, size: size}) => {
                 const width = keyWidth * size;
                 const height = keyHeight;
@@ -510,6 +534,11 @@ function drawKeyboard(theme) {
     }))
 }
 
+// Export function to update theme from animation module
+export function updateTheme(theme) {
+    drawKeyboard(theme);
+}
+
 function handleKeyDown(event) {
     let key = event.key.toLowerCase();
     if (key === " ") key = "space";
@@ -527,15 +556,6 @@ function handleKeyUp(event) {
         drawKeyboard(currentTheme)
     }
 }
-
-window.addEventListener("keydown", handleKeyDown);
-window.addEventListener("keyup", handleKeyUp);
-document.addEventListener("DOMContentLoaded", (() => {
-    document.fonts.ready.then((() => {
-        fetchParagraphs();
-        drawKeyboard(currentTheme)
-    }))
-}));
 
 function showPopup(event, text) {
     const popup = document.getElementById("popup");

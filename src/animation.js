@@ -1,4 +1,5 @@
-window.onload = function () {
+// Initialize animation when called from main
+export function initializeAnimation() {
     document.body.offsetHeight;
     startPageAnimation();
 
@@ -10,7 +11,7 @@ window.onload = function () {
         logoIcon.style.transform = `rotate(${currentRotation}deg)`;
         logoIcon.setAttribute("data-rotation", currentRotation);
     }
-};
+}
 
 // Page Animation
 function startPageAnimation() {
@@ -47,8 +48,8 @@ function startPageAnimation() {
     }, 1000);
 }
 
-// Theme Toggle
-function toggle_mode() {
+// Theme Toggle - exported for global use
+export function toggle_mode() {
     const bodyElement = document.getElementsByTagName("body")[0];
     const logoIcon = document.getElementById("themeToggle");
     const linkElements = document.querySelectorAll("a");
@@ -57,12 +58,13 @@ function toggle_mode() {
     currentRotation += 360;
 
     const darkIcon = "src/assets/images/dark_icon.png";
-const lightIcon = "src/assets/images/light_icon.png";
+    const lightIcon = "src/assets/images/light_icon.png";
 
     logoIcon.style.transition = "transform 0.3s ease-in-out";
     logoIcon.style.transform = `rotate(${currentRotation}deg)`;
     logoIcon.setAttribute('data-rotation', currentRotation);
 
+    let newTheme;
     if (bodyElement.classList.contains("body2")) {
         bodyElement.classList.remove("body2");
         bodyElement.classList.add("body");
@@ -73,7 +75,7 @@ const lightIcon = "src/assets/images/light_icon.png";
             link.classList.remove("light-mode-link");
         });
 
-        currentTheme = 'dark';
+        newTheme = 'dark';
     } else {
         bodyElement.classList.remove("body");
         bodyElement.classList.add("body2");
@@ -84,10 +86,13 @@ const lightIcon = "src/assets/images/light_icon.png";
             link.classList.remove("dark-mode-link");
         });
 
-        currentTheme = 'light';
+        newTheme = 'light';
     }
 
-    drawKeyboard(currentTheme);
+    // Update the theme in typing module and redraw keyboard
+    if (typeof window.updateTheme === 'function') {
+        window.updateTheme(newTheme);
+    }
 }
 
 
