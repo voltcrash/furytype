@@ -617,19 +617,6 @@ function handleKeyUp(event: KeyboardEvent): void {
     }
 }
 
-// Commented out unused functions - keeping them for potential future use
-// function showPopup(event: MouseEvent, text: string): void {
-//     const popup = document.getElementById("popup") as HTMLElement;
-//     popup.style.left = `${event.pageX + 10}px`;
-//     popup.style.top = `${event.pageY + 10}px`;
-//     popup.textContent = text;
-//     popup.style.display = "block";
-// }
-
-// function hidePopup(): void {
-//     const popup = document.getElementById("popup") as HTMLElement;
-//     popup.style.display = "none";
-// }
 
 function drawGraph(): void {
     const graphCanvas = document.getElementById("resultGraph") as HTMLCanvasElement;

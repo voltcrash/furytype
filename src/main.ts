@@ -1,11 +1,8 @@
-// Import CSS
 import './styles.css';
 
-// Import modules
 import { initializeAnimation, toggle_mode } from './animation.js';
 import { initializeTypingTest, updateTheme } from './typing.js';
 
-// Extend window interface for global functions
 declare global {
     interface Window {
         toggle_mode: () => void;
@@ -13,7 +10,6 @@ declare global {
     }
 }
 
-// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     initializeAnimation();
     initializeTypingTest();
