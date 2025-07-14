@@ -1,24 +1,14 @@
 {
-  "name": "y",
-  "version": "1.0.0",
-  "description": "Welcome to FuryType, a website where you can test, practice and improve your typing speed.",
-  "main": "index.js",
+  "name": "furytype",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lakshmitanmay/FuryType.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lakshmitanmay/FuryType/issues"
-  },
-  "homepage": "https://github.com/lakshmitanmay/FuryType#readme",
-  "dependencies": {
-    "body-parser": "^1.20.3",
-    "express": "^4.21.2",
-    "mysql2": "^3.13.0"
+  "devDependencies": {
+    "vite": "^7.0.4"
   }
 }
