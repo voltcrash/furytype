@@ -1,5 +1,3 @@
-// Use public folder paths that work in both development and production
-
 // Initialize animation when called from main
 export function initializeAnimation(): void {
     document.body.offsetHeight;
@@ -55,13 +53,12 @@ export function toggle_mode(): void {
     const bodyElement = document.getElementsByTagName("body")[0] as HTMLBodyElement;
     const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
     const linkElements = document.querySelectorAll("a") as NodeListOf<HTMLAnchorElement>;
-
+    const githubLogo = document.getElementById("githubLogo") as HTMLImageElement;
     let currentRotation = parseInt(logoIcon.getAttribute('data-rotation') || '0');
     currentRotation += 360;
 
-    // Use public folder paths that work in both development and production
-    const darkIcon = "/images/dark_icon.png";
-    const lightIcon = "/images/light_icon.png";
+    const darkGit = "/images/github.svg";
+    const lightGit = "/images/github-light.svg";
 
     logoIcon.style.transition = "transform 0.3s ease-in-out";
     logoIcon.style.transform = `rotate(${currentRotation}deg)`;
@@ -71,7 +68,7 @@ export function toggle_mode(): void {
     if (bodyElement.classList.contains("body2")) {
         bodyElement.classList.remove("body2");
         bodyElement.classList.add("body");
-        logoIcon.src = darkIcon;
+        githubLogo.src = darkGit;
 
         linkElements.forEach((link: HTMLAnchorElement) => {
             link.classList.add("dark-mode-link");
@@ -82,7 +79,7 @@ export function toggle_mode(): void {
     } else {
         bodyElement.classList.remove("body");
         bodyElement.classList.add("body2");
-        logoIcon.src = lightIcon;
+        githubLogo.src = lightGit;
 
         linkElements.forEach((link: HTMLAnchorElement) => {
             link.classList.add("light-mode-link");

@@ -633,7 +633,7 @@ function drawGraph(): void {
     if (wpmHistory.length === 0) return;
     const maxWpm = Math.max(...wpmHistory.map((item: WPMHistoryItem) => item.wpm), 10);
     const themeColors: ThemeConfig = {
-        dark: {graphBackgroundColor: "rgb(36,41,51)", graphLineColor: "rgb(136,192,208)"},
+        dark: {graphBackgroundColor: "rgb(10,10,10)", graphLineColor: "rgb(136,192,208)"},
         light: {graphBackgroundColor: "rgb(235,239,243)", graphLineColor: "rgb(121,163,162)"}
     } as any;
     ctx.fillStyle = (themeColors[currentTheme] as any).graphBackgroundColor;
