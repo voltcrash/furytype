@@ -1,3 +1,5 @@
+// Use public folder paths that work in both development and production
+
 // Initialize animation when called from main
 export function initializeAnimation(): void {
     document.body.offsetHeight;
@@ -57,8 +59,9 @@ export function toggle_mode(): void {
     let currentRotation = parseInt(logoIcon.getAttribute('data-rotation') || '0');
     currentRotation += 360;
 
-    const darkIcon = "src/assets/images/dark_icon.png";
-    const lightIcon = "src/assets/images/light_icon.png";
+    // Use public folder paths that work in both development and production
+    const darkIcon = "/images/dark_icon.png";
+    const lightIcon = "/images/light_icon.png";
 
     logoIcon.style.transition = "transform 0.3s ease-in-out";
     logoIcon.style.transform = `rotate(${currentRotation}deg)`;
