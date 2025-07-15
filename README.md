@@ -1,7 +1,7 @@
 <div align="center">  
 
 <p align="center">
-    <img src="public/furytype-social.png" width="600">
+    <img src="docs/images/banner.png" width="600">
 </p>
 
 <a href="https://furytype.voltcrash.com"><em> a simple typing practice platform</em></a>
