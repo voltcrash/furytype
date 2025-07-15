@@ -17,8 +17,8 @@ body.body {
 }
 
 body.body2 {
-    color: #697791;
-    background-color: #EBEFF4;
+    color: #A0A0A0;
+    background-color: #FFFFFF;
     height: 100vh;
     width: 100%;
 }
@@ -35,41 +35,41 @@ a {
 }
 
 body.body a {
-    color: #D8DEE9;
+    color: #FFFFFF;
 }
 
 body.body2 a {
-    color: #697791;
+    color: #000000;
 }
 
 body.body a:visited {
-    color: #D8DEE9;
+    color: #FFFFFF;
 }
 
 body.body2 a:visited {
-    color: #697791;
+    color: #000000;
 }
 
 body.body a:hover {
-    color: #88C0D0;
+    color: #FFC799;
 }
 
 body.body2 a:hover {
-    color: #79A3A2;
+    color: #FF8C00;
 }
 
 body.body .nav_bar_right ul li a:hover {
-    border-bottom: 2px ridge #88C0D0;
+    border-bottom: 2px ridge #FFC799;
     padding: 12px 17px;
     border-radius: 100px;
-    color: #88C0D0;
+    color: #FFC799;
 }
 
 body.body2 .nav_bar_right ul li a:hover {
-    border-bottom: 2px ridge #79A3A2;
+    border-bottom: 2px ridge #FF8C00;
     padding: 12px 17px;
     border-radius: 100px;
-    color: #79A3A2;
+    color: #FF8C00;
 }
 
 /* Typography */
@@ -84,21 +84,6 @@ h1, h3 {
     font-weight: 600;
 }
 
-.greeting {
-    font-size: 14px;
-    font-style: italic;
-    margin-left: 75px;
-    margin-top: -18px;
-}
-
-body.body .greeting {
-    color: #88C0D0;
-}
-
-body.body2 .greeting {
-    color: #79A3A2;
-}
-
 /* Navigation Bar */
 .nav_bar {
     display: flex;
@@ -107,6 +92,16 @@ body.body2 .greeting {
     align-items: center;
     padding: 0 3%;
     position: relative;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.nav_bar.hidden {
+    opacity: 0 !important;
+    transform: translateY(-20px) !important;
+    pointer-events: none !important;
 }
 
 .nav_bar_left {
@@ -128,10 +123,10 @@ body.body2 .greeting {
 }
 
 .nav_bar_right ul li a:hover {
-    border-bottom: 2px ridge #88C0D0;
+    border-bottom: 2px ridge #FFC799;
     padding: 12px 17px;
     border-radius: 100px;
-    color: #88C0D0;
+    color: #FFC799;
 }
 
 /* Logo */
@@ -189,33 +184,33 @@ body.body2 .greeting {
     position: absolute;
     width: 2px;
     height: 1.5rem;
-    background-color: #88BFD0;
+    background-color: #FFC799;
     animation: blink 1s steps(1) infinite;
     transition: left 0.05s ease-out, top 0.05s ease-out;
 }
 
 body.body2 .caret {
-    background-color: #79A3A2;
+    background-color: #FF8C00;
 }
 
 body.body .untyped {
-    color: #919AAB;
+    color: #A0A0A0;
 }
 
 body.body .correct {
-    color: #D8DEE9;
+    color: #FFFFFF;
 }
 
 .incorrect {
-    color: #BF616A;
+    color: #FF8080;
 }
 
 body.body2 .untyped {
-    color: #697791;
+    color: #A0A0A0;
 }
 
 body.body2 .correct {
-    color: #79A3A2;
+    color: #000000;
 }
 
 #timeBarContainer {
@@ -229,12 +224,12 @@ body.body2 .correct {
 
 #timeBar {
     height: 100%;
-    background-color: rgb(61, 80, 90);
+    background-color: #4C3E32;
     transition: width 0.3s ease-in-out;
 }
 
 body.body2 #timeBar {
-    background-color: rgba(121, 163, 162, 0.57);
+    background-color: #FFC799;
 }
 
 #typingMetrics {
@@ -251,9 +246,9 @@ body.body2 #timeBar {
     font-size: 20px;
     font-family: "Jost", sans-serif;
     font-weight: 400;
-    color: #88BFD0;
+    color: #4C3E32;
     border-radius: 15px;
-    background: #2E3440;
+    background: #1C1C1C;
     width: 300px;
     height: 30px;
     padding: 5px;
@@ -266,8 +261,8 @@ body.body2 #timeBar {
 }
 
 body.body2 #typingMetrics {
-    color: #79A3A2;
-    background: #D8DEE9;
+    color: #FF8C00;
+    background: #E3E3E3;
 }
 
 .result-screen {
@@ -277,7 +272,7 @@ body.body2 #typingMetrics {
     width: 100%;
     height: 100%;
     background-color: rgb(10, 10, 10);
-    color: #d8dee9;
+    color: #FFFFFF;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -291,8 +286,7 @@ body.body2 #typingMetrics {
 }
 
 body.body2 .result-screen {
-    background-color: rgb(235, 239, 243);
-    color: #697791;
+    background-color: rgb(255, 255, 255);
 }
 
 
@@ -310,13 +304,13 @@ body.body2 .result-screen {
     font-weight: 400;
     margin-bottom: 20px;
     text-align: center;
-    color: #D8DEE9;
+    color: #FFFFFF;
     opacity: 0.8;
     align-self: center;
 }
 
 body.body2 .result-screen h2 {
-    color: #697791;
+    color: #000000;
 }
 
 .result-screen .main-result {
@@ -325,24 +319,24 @@ body.body2 .result-screen h2 {
     font-weight: 500;
     text-align: center;
     margin-bottom: 30px;
-    color: #D8DEE9;
+    color: #FFFFFF;
     position: relative;
     align-self: center;
 }
 
 body.body2 .result-screen .main-result {
-    color: #697791;
+    color: #000000;
 }
 
 .result-screen .main-result span {
     font-size: 0.6em;
     font-weight: 400;
     margin-left: 10px;
-    color: #D8DEE9;
+    color: #FFFFFF;
 }
 
 body.body2 .result-screen .main-result span {
-    color: #697791;
+    color: #000000;
 }
 
 .result-screen .metrics-container {
@@ -360,24 +354,24 @@ body.body2 .result-screen .main-result span {
     flex-direction: row;
     align-items: center;
     font-size: 1em;
-    color: #D8DEE9;
+    color: #FFFFFF;
     text-align: left;
     white-space: nowrap;
 }
 
 body.body2 .result-screen .metric {
-    color: #697791;
+    color: #000000;
 }
 
 .result-screen .metric span {
     font-size: 1.5em;
     font-weight: 400;
-    color: #D8DEE9;
+    color: #FFFFFF;
     margin-left: 10px;
 }
 
 body.body2 .result-screen .metric span {
-    color: #697791;
+    color: #000000;
 }
 
 .result-screen #resultGraph {
@@ -409,7 +403,7 @@ body.body2 .result-screen .metric span {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: rgb(136, 192, 208);
+    background-color: rgb(255, 199, 153);
     color: #000;
     font-size: 2em;
     display: flex;
@@ -425,14 +419,16 @@ body.body2 .result-screen .metric span {
 }
 
 body.body2 .retry-button {
-    background-color: rgb(121, 163, 162);
+    background-color: rgb(255, 140, 0);
 }
 
 .retry-button:hover {
     transform: translateY(-2px);
-    background-color: rgb(216, 222, 233);
+    background-color: #FFFFFF;
+    color: #000000
 }
 
 body.body2 .retry-button:hover {
-    background-color: rgb(105, 119, 145);
+    background-color: rgb(00, 00, 00);
+    color: #FFFFFF;
 }

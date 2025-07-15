@@ -1,3 +1,6 @@
+// Import navigation bar functions
+import { hideNavbar, showNavbar } from './animation';
+
 // Interfaces and types
 interface Key {
     label: string;
@@ -116,15 +119,12 @@ function fetchParagraphs(): void {
             const fetchedParagraphs = xhr.responseText.split("\n").filter((line: string) => line.trim() !== "");
             if (fetchedParagraphs.length > 0) {
                 paragraphs = fetchedParagraphs;
-                console.log(`Loaded ${paragraphs.length} paragraphs successfully`);
             } else {
-                console.warn("No paragraphs fetched, using fallback");
                 paragraphs = fallbackParagraphs;
             }
             testText = getRandomParagraph();
             initializeTypingTestUI();
         } else {
-            console.error("Failed to load paragraphs. Status:", xhr.status, "Using fallback paragraphs");
             paragraphs = fallbackParagraphs;
             testText = getRandomParagraph();
             initializeTypingTestUI();
@@ -132,14 +132,12 @@ function fetchParagraphs(): void {
     };
     
     xhr.onerror = function () {
-        console.error("Network error loading paragraphs. Using fallback paragraphs");
         paragraphs = fallbackParagraphs;
         testText = getRandomParagraph();
         initializeTypingTestUI();
     };
     
     xhr.ontimeout = function () {
-        console.error("Timeout loading paragraphs. Using fallback paragraphs");
         paragraphs = fallbackParagraphs;
         testText = getRandomParagraph();
         initializeTypingTestUI();
@@ -198,11 +196,14 @@ const highlightTimeouts: Record<string, number> = {};
 let pressedKey: string | null = null;
 
 function handleTyping(event: KeyboardEvent): void {
-    const validKeyRegex = /^[a-zA-Z0-9 .,;'/[\]\\\-_=+{}|:>?<()*&^!@#$%~`]$/;
+    const validKeyRegex = /^[a-zA-Z0-9 .,;'/[\]\\\-_=+{}|:>?<()*&^!@#$%~`"]$/;
     const typedChar = event.key;
     if (!validKeyRegex.test(typedChar) && event.key !== "Backspace" || event.metaKey) {
         return;
     }
+    // Prevent default browser behavior for valid typing characters
+    event.preventDefault();
+    
     if (typedChar === pressedKey) {
         return;
     }
@@ -215,6 +216,8 @@ function handleTyping(event: KeyboardEvent): void {
         const timeBar = document.getElementById("timeBar") as HTMLElement;
         timeBar.style.visibility = "visible";
         startMetricUpdater();
+        // Hide navigation bar when typing starts
+        hideNavbar();
     }
     const typeTest = document.getElementById("typeTest") as HTMLElement;
     const spans = typeTest.querySelectorAll("span") as NodeListOf<HTMLSpanElement>;
@@ -387,6 +390,9 @@ function startMetricUpdater(): void {
 function endTypingTest(): void {
     clearInterval(timerInterval!);
     clearInterval(metricUpdaterInterval!);
+    
+    // Show navigation bar when typing ends
+    showNavbar();
 
     const typeTest = document.getElementById('typeTest');
     if (typeTest) {
@@ -495,7 +501,6 @@ function calculateConsistency(): number {
 
 function resetTestState(): void {
     try {
-        console.log("Resetting test state...");
         currentIndex = 0;
         correctChars = 0;
         totalChars = 0;
@@ -505,6 +510,9 @@ function resetTestState(): void {
         lastCharacterTime = null;
         consistencyScores = [];
         currentConsistency = 100;
+        
+        // Show navigation bar when test is reset
+        showNavbar();
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -528,7 +536,6 @@ function resetTestState(): void {
         }
         testText = getRandomParagraph();
         initializeTypingTestUI();
-        console.log("Test state reset successfully.");
     } catch (error) {
         console.error("Error resetting test state:", error);
     }
@@ -544,15 +551,15 @@ export function drawKeyboard(theme: Theme): void {
         ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 2), canvas.height / (window.devicePixelRatio || 2));
         const themeColors: ThemeConfig = {
             dark: {
-                keyColor: "rgb(46,52,64)",
-                pressedKeyColor: "rgb(136,192,208)",
-                incorrectKeyColor: "rgb(191,97,106)",
-                keyTextColor: "rgb(145,154,171)"
+                keyColor: "rgb(28,28,28)",
+                pressedKeyColor: "rgb(76,62,50)",
+                incorrectKeyColor: "rgb(178,89,89)",
+                keyTextColor: "rgb(160,160,160)"
             }, light: {
-                keyColor: "rgb(216,222,233)",
-                pressedKeyColor: "rgb(143,188,187)",
-                incorrectKeyColor: "rgb(191,97,106)",
-                keyTextColor: "rgb(105,119,145)"
+                keyColor: "rgb(227,227,227)",
+                pressedKeyColor: "rgb(255,199,153)",
+                incorrectKeyColor: "rgb(178,89,89)",
+                keyTextColor: "rgb(160,160,160)"
             }
         };
         let y = startY;
@@ -633,8 +640,8 @@ function drawGraph(): void {
     if (wpmHistory.length === 0) return;
     const maxWpm = Math.max(...wpmHistory.map((item: WPMHistoryItem) => item.wpm), 10);
     const themeColors: ThemeConfig = {
-        dark: {graphBackgroundColor: "rgb(10,10,10)", graphLineColor: "rgb(136,192,208)"},
-        light: {graphBackgroundColor: "rgb(235,239,243)", graphLineColor: "rgb(121,163,162)"}
+        dark: {graphBackgroundColor: "rgb(10, 10, 10)", graphLineColor: "rgb(255, 199, 153)"},
+        light: {graphBackgroundColor: "rgb(255,255,255)", graphLineColor: "rgb(255,140,0)"}
     } as any;
     ctx.fillStyle = (themeColors[currentTheme] as any).graphBackgroundColor;
     ctx.fillRect(0, 0, graphCanvas.width / scaleFactor, graphCanvas.height / scaleFactor);

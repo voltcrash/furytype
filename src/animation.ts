@@ -4,13 +4,10 @@ export function initializeAnimation(): void {
     startPageAnimation();
 
     const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
-    let currentRotation = parseInt(logoIcon.getAttribute("data-rotation") || "0");
-
-    if (isNaN(currentRotation) || currentRotation === 0) {
-        currentRotation = 405;
-        logoIcon.style.transform = `rotate(${currentRotation}deg)`;
-        logoIcon.setAttribute("data-rotation", currentRotation.toString());
-    }
+    
+    // Start the logo at 0 degrees - no jarring initial rotation
+    logoIcon.style.transform = `rotate(0deg)`;
+    logoIcon.setAttribute("data-rotation", "0");
 }
 
 // Page Animation
@@ -28,7 +25,13 @@ function startPageAnimation(): void {
 
     setTimeout(() => {
         logoIcon.style.transition = "transform 1s ease-out";
-        logoIcon.style.transform = `rotate(495deg)`;
+        logoIcon.style.transform = `rotate(360deg)`;
+        // Reset to 0 degrees after animation completes
+        setTimeout(() => {
+            logoIcon.style.transition = "none";
+            logoIcon.style.transform = `rotate(0deg)`;
+            logoIcon.setAttribute("data-rotation", "0");
+        }, 1000);
     }, 300);
 
     header.style.opacity = "0";
@@ -54,15 +57,23 @@ export function toggle_mode(): void {
     const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
     const linkElements = document.querySelectorAll("a") as NodeListOf<HTMLAnchorElement>;
     const githubLogo = document.getElementById("githubLogo") as HTMLImageElement;
+    
+    // Always rotate 360 degrees from current position
     let currentRotation = parseInt(logoIcon.getAttribute('data-rotation') || '0');
-    currentRotation += 360;
+    let targetRotation = currentRotation + 360;
 
     const darkGit = "/images/github.svg";
     const lightGit = "/images/github-light.svg";
 
     logoIcon.style.transition = "transform 0.3s ease-in-out";
-    logoIcon.style.transform = `rotate(${currentRotation}deg)`;
-    logoIcon.setAttribute('data-rotation', currentRotation.toString());
+    logoIcon.style.transform = `rotate(${targetRotation}deg)`;
+
+    // Reset to 0 degrees after animation completes
+    setTimeout(() => {
+        logoIcon.style.transition = "none";
+        logoIcon.style.transform = `rotate(0deg)`;
+        logoIcon.setAttribute('data-rotation', '0');
+    }, 300);
 
     let newTheme: string;
     if (bodyElement.classList.contains("body2")) {
@@ -92,5 +103,22 @@ export function toggle_mode(): void {
     // Update the theme in typing module and redraw keyboard
     if (typeof (window as any).updateTheme === 'function') {
         (window as any).updateTheme(newTheme);
+    }
+}
+
+// Navigation Bar Control - exported for use during typing
+export function hideNavbar(): void {
+    const navbar = document.querySelector(".nav_bar") as HTMLElement;
+    if (navbar) {
+        navbar.classList.remove("visible");
+        navbar.classList.add("hidden");
+    }
+}
+
+export function showNavbar(): void {
+    const navbar = document.querySelector(".nav_bar") as HTMLElement;
+    if (navbar) {
+        navbar.classList.remove("hidden");
+        navbar.classList.add("visible");
     }
 }
