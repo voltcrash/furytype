@@ -40,8 +40,11 @@ type Theme = 'dark' | 'light';
 // Global state variables
 let testText: string = "";
 let currentIndex: number = 0;
+let totalTime: number = 30;
+let timeLeft: number = totalTime;
 let correctChars: number = 0;
 let totalChars: number = 0;
+let timerInterval: number | null = null;
 let timerStarted: boolean = false;
 let startTime: number | null = null;
 let wpmHistory: WPMHistoryItem[] = [];
@@ -49,8 +52,6 @@ let consistencyScores: number[] = [];
 let lastCharacterTime: number | null = null;
 let currentConsistency: number = 100;
 let paragraphs: string[] = [];
-let currentParagraphIndex: number = 0;
-let testStarted: boolean = false;
 
 // Canvas and keyboard state
 const canvas = document.getElementById("keyboardCanvas") as HTMLCanvasElement;
@@ -122,6 +123,7 @@ function fetchParagraphs(): void {
         console.error("Error loading paragraphs:", error);
         paragraphs = fallbackParagraphs;
     }
+    testText = getRandomParagraph();
     initializeTypingTestUI();
 }
 
@@ -129,34 +131,28 @@ function initializeTypingTestUI(): void {
     currentIndex = 0;
     correctChars = 0;
     totalChars = 0;
-    testStarted = false;
+    timeLeft = totalTime;
     updateMetrics(0, 100, 0);
     wpmHistory = [];
     consistencyScores = [];
     startTime = null;
     lastCharacterTime = null;
     currentConsistency = 100;
-    
-    // Hide time bar completely since we're not using time-based testing
     const timeBar = document.getElementById("timeBar") as HTMLElement;
-    if (timeBar) {
-        timeBar.style.display = "none";
-    }
-    
-    // Generate initial text with multiple paragraphs for infinite typing
-    generateInfiniteText();
-    
-    // Create text display with 3-line limit
-    createTextDisplay();
-    
-    // Remove any existing typing metrics first
-    const existingMetrics = document.getElementById("typingMetrics");
-    if (existingMetrics) {
-        existingMetrics.remove();
-    }
-    
-    // Create new typing metrics
+    timeBar.style.visibility = "hidden";
+    timeBar.style.width = "100%";
     const typeTest = document.getElementById("typeTest") as HTMLElement;
+    typeTest.innerHTML = "";
+    testText.split("").forEach((char: string) => {
+        const span = document.createElement("span");
+        span.textContent = char;
+        span.classList.add("untyped");
+        typeTest.appendChild(span);
+    });
+    const caret = document.createElement("div");
+    caret.classList.add("caret");
+    typeTest.appendChild(caret);
+    updateCaretPosition(caret, typeTest.querySelector("span.untyped") as HTMLSpanElement);
     const typingMetrics = document.createElement("div");
     typingMetrics.id = "typingMetrics";
     typingMetrics.innerHTML = `
@@ -167,43 +163,8 @@ function initializeTypingTestUI(): void {
     typingMetrics.style.left = "0";
     typeTest.appendChild(typingMetrics);
     typingMetrics.classList.remove("visible");
-    
     document.removeEventListener("keydown", handleTyping);
     document.addEventListener("keydown", handleTyping);
-}
-
-function generateInfiniteText(): void {
-    // Start with multiple paragraphs to ensure smooth infinite typing
-    let combinedText = "";
-    for (let i = 0; i < 5; i++) {
-        if (i > 0) combinedText += " ";
-        combinedText += getRandomParagraph();
-    }
-    testText = combinedText;
-}
-
-function createTextDisplay(): void {
-    const typeTest = document.getElementById("typeTest") as HTMLElement;
-    typeTest.innerHTML = "";
-    
-    // Set up the typeTest element for 3-line display (preserve existing styling)
-    typeTest.style.height = "6rem"; // 3 lines at 2rem line-height
-    typeTest.style.overflow = "hidden";
-    
-    // Split text into characters and create spans directly in typeTest
-    testText.split("").forEach((char: string, index: number) => {
-        const span = document.createElement("span");
-        span.textContent = char;
-        span.classList.add("untyped");
-        span.id = `char-${index}`;
-        typeTest.appendChild(span);
-    });
-    
-    const caret = document.createElement("div");
-    caret.classList.add("caret");
-    typeTest.appendChild(caret);
-    
-    updateCaretPosition(caret, typeTest.querySelector("span.untyped") as HTMLSpanElement);
 }
 
 function getRandomParagraph(): string {
@@ -218,21 +179,6 @@ let pressedKey: string | null = null;
 function handleTyping(event: KeyboardEvent): void {
     const validKeyRegex = /^[a-zA-Z0-9 .,;'/[\]\\\-_=+{}|:>?<()*&^!@#$%~`"]$/;
     const typedChar = event.key;
-    
-    // Handle Enter key to end the test
-    if (event.key === "Enter") {
-        event.preventDefault();
-        endTypingTest();
-        return;
-    }
-    
-    // Handle tab key to refresh the test
-    if (event.key === "Tab") {
-        event.preventDefault();
-        resetTestState();
-        return;
-    }
-    
     if (!validKeyRegex.test(typedChar) && event.key !== "Backspace" || event.metaKey) {
         return;
     }
@@ -243,21 +189,20 @@ function handleTyping(event: KeyboardEvent): void {
         return;
     }
     pressedKey = typedChar;
-    
-    // Start the test on first valid character
-    if (!testStarted && validKeyRegex.test(typedChar) && typedChar !== " " && typedChar !== "Backspace") {
-        testStarted = true;
+    if (!timerStarted && validKeyRegex.test(typedChar) && typedChar !== " " && typedChar !== "Backspace") {
+        startTimer();
+        timerStarted = true;
         startTime = (new Date()).getTime();
         lastCharacterTime = (new Date()).getTime();
+        const timeBar = document.getElementById("timeBar") as HTMLElement;
+        timeBar.style.visibility = "visible";
         startMetricUpdater();
         // Hide navigation bar when typing starts
         hideNavbar();
     }
-    
     const typeTest = document.getElementById("typeTest") as HTMLElement;
     const spans = typeTest.querySelectorAll("span") as NodeListOf<HTMLSpanElement>;
     const caret = typeTest.querySelector(".caret") as HTMLElement;
-    
     if (typedChar === "Backspace") {
         if (event.ctrlKey || event.altKey || event.metaKey) {
             deletePreviousWord(spans, caret);
@@ -271,23 +216,6 @@ function handleTyping(event: KeyboardEvent): void {
         }
         return;
     }
-    
-    // Expand text if we're approaching the end
-    if (currentIndex >= testText.length - 200) {
-        const newParagraph = " " + getRandomParagraph();
-        testText += newParagraph;
-        
-        // Add new spans for the new text
-        const newTextStart = testText.length - newParagraph.length;
-        for (let i = newTextStart; i < testText.length; i++) {
-            const span = document.createElement("span");
-            span.textContent = testText[i];
-            span.classList.add("untyped");
-            span.id = `char-${i}`;
-            typeTest.insertBefore(span, caret);
-        }
-    }
-    
     if (currentIndex >= testText.length) return;
     totalChars++;
 
@@ -330,53 +258,24 @@ function handleTyping(event: KeyboardEvent): void {
         highlightKey(typedChar, false);
         currentIndex++;
     }
-    
     if (currentIndex < testText.length) {
         if (caret && spans[currentIndex]) {
             updateCaretPosition(caret, spans[currentIndex]);
         }
+    } else if (currentIndex === testText.length) {
+        endTypingTest();
     }
-    
-    // Update WPM history and consistency
     if (startTime) {
         const now = (new Date()).getTime();
         const elapsedTime = (now - startTime) / 1000;
         const wpm = calculateWPM(correctChars, elapsedTime);
-        wpmHistory.push({time: elapsedTime, wpm: wpm});
+        wpmHistory.push({time: totalTime - timeLeft, wpm: wpm});
         if (lastCharacterTime) {
             const timeSinceLastChar = (now - lastCharacterTime) / 1000;
             consistencyScores.push(timeSinceLastChar);
             currentConsistency = calculateConsistency();
         }
         lastCharacterTime = now;
-    }
-    
-    // Scroll text to maintain 3-line view
-    scrollToCurrentPosition();
-}
-
-function scrollToCurrentPosition(): void {
-    const typeTest = document.getElementById("typeTest") as HTMLElement;
-    const currentSpan = document.getElementById(`char-${currentIndex}`) as HTMLSpanElement;
-    
-    if (typeTest && currentSpan) {
-        const containerHeight = typeTest.offsetHeight;
-        const currentSpanTop = currentSpan.offsetTop;
-        const lineHeight = 32; // 2rem = 32px (as per CSS)
-        
-        // Calculate if we need to scroll to keep current position visible
-        const scrollTop = typeTest.scrollTop;
-        const visibleTop = scrollTop;
-        const visibleBottom = scrollTop + containerHeight;
-        
-        // If current character is getting close to the bottom, scroll down
-        if (currentSpanTop + lineHeight > visibleBottom - lineHeight) {
-            typeTest.scrollTop = currentSpanTop + lineHeight - containerHeight + lineHeight;
-        }
-        // If current character is above visible area, scroll up
-        else if (currentSpanTop < visibleTop) {
-            typeTest.scrollTop = Math.max(0, currentSpanTop - lineHeight);
-        }
     }
 }
 
@@ -403,6 +302,20 @@ document.addEventListener("keyup", (event: KeyboardEvent) => {
         pressedKey = null;
     }
 });
+
+function startTimer(): void {
+    const timeBar = document.getElementById("timeBar") as HTMLElement;
+    timeBar.style.visibility = "visible";
+    timerInterval = window.setInterval(() => {
+        timeLeft--;
+        const progress = timeLeft / totalTime * 100;
+        timeBar.style.width = `${progress}%`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval!);
+            endTypingTest();
+        }
+    }, 1000);
+}
 
 function updateCaretPosition(caret: HTMLElement, targetSpan: HTMLSpanElement): void {
     if (caret && targetSpan) {
@@ -456,10 +369,8 @@ function startMetricUpdater(): void {
 }
 
 function endTypingTest(): void {
-    if (metricUpdaterInterval) {
-        clearInterval(metricUpdaterInterval);
-        metricUpdaterInterval = null;
-    }
+    clearInterval(timerInterval!);
+    clearInterval(metricUpdaterInterval!);
     
     // Show navigation bar when typing ends
     showNavbar();
@@ -477,20 +388,20 @@ function endTypingTest(): void {
         document.body.appendChild(resultScreen);
     }
 
-    const elapsedTime = startTime ? ((new Date()).getTime() - startTime) / 1000 : 1;
-    const wpm = calculateWPM(correctChars, elapsedTime);
+    const wpm = calculateWPM(correctChars, totalTime - timeLeft);
     const accuracy = calculateAccuracy(correctChars, totalChars);
-    const typedParagraph = testText.substring(0, currentIndex);
+    const typedParagraph = testText;
+    const resultTime = totalTime - timeLeft;
     const numCorrect = correctChars;
     const numIncorrect = totalChars - correctChars;
     const numUntyped = testText.length - totalChars;
-    const rawWpm = Math.round(totalChars / elapsedTime * 60 * 0.2).toFixed(2);
+    const rawWpm = Math.round(totalChars / resultTime * 60 * 0.2).toFixed(2);
     currentConsistency = calculateConsistency();
 
     const raceData: RaceData = {
         sno: new Date().getTime(), // Unique serial number (timestamp)
         dateTime: new Date().toISOString(),
-        duration: `${elapsedTime.toFixed(2)}`,
+        duration: `${resultTime.toFixed(2)}`,
         wpm: wpm,
         accuracy: `${accuracy}`,
         paragraph: typedParagraph
@@ -519,7 +430,7 @@ function endTypingTest(): void {
             </div>
              <div class="metric">
                 time
-                <span>${elapsedTime.toFixed(2)}s</span>
+                <span>${resultTime.toFixed(2)}s</span>
             </div>
              <canvas id="resultGraph"></canvas>
 
@@ -528,19 +439,9 @@ function endTypingTest(): void {
     `;
     drawGraph();
 
+
     const tryAgainButton = document.querySelector('.retry-button') as HTMLButtonElement;
     tryAgainButton.addEventListener('click', resetTestState);
-    
-    // Add keyboard event listeners for tab and enter keys on result screen
-    const resultScreenKeyHandler = (event: KeyboardEvent) => {
-        if (event.key === "Tab" || event.key === "Enter") {
-            event.preventDefault();
-            document.removeEventListener('keydown', resultScreenKeyHandler);
-            resetTestState();
-        }
-    };
-    document.addEventListener('keydown', resultScreenKeyHandler);
-    
     const typingMetrics = document.getElementById("typingMetrics");
     if (typingMetrics) {
         typingMetrics.remove();
@@ -584,7 +485,8 @@ function resetTestState(): void {
         currentIndex = 0;
         correctChars = 0;
         totalChars = 0;
-        testStarted = false;
+        timerStarted = false;
+        timeLeft = totalTime;
         startTime = null;
         lastCharacterTime = null;
         consistencyScores = [];
@@ -592,12 +494,14 @@ function resetTestState(): void {
         
         // Show navigation bar when test is reset
         showNavbar();
-        
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
         if (metricUpdaterInterval) {
             clearInterval(metricUpdaterInterval);
             metricUpdaterInterval = null;
         }
-        
         const resultScreen = document.getElementById("resultScreen") as HTMLElement;
         if (resultScreen) {
             resultScreen.classList.add("fadeOut");
@@ -607,14 +511,11 @@ function resetTestState(): void {
                 }
             }, {once: true});
         }
-        
         const typeTest = document.getElementById("typeTest") as HTMLElement;
         if (typeTest) {
             typeTest.style.display = "block";
         }
-        
-        // Generate new infinite text
-        generateInfiniteText();
+        testText = getRandomParagraph();
         initializeTypingTestUI();
     } catch (error) {
         console.error("Error resetting test state:", error);
@@ -718,32 +619,23 @@ function drawGraph(): void {
     const graphWidth = graphCanvas.width / scaleFactor - 2 * padding;
     const graphHeight = graphCanvas.height / scaleFactor - 2 * padding;
     if (wpmHistory.length === 0) return;
-    
     const maxWpm = Math.max(...wpmHistory.map((item: WPMHistoryItem) => item.wpm), 10);
-    const maxTime = Math.max(...wpmHistory.map((item: WPMHistoryItem) => item.time), 1);
-    
     const themeColors: ThemeConfig = {
         dark: {graphBackgroundColor: "rgb(10, 10, 10)", graphLineColor: "rgb(255, 199, 153)"},
         light: {graphBackgroundColor: "rgb(255,255,255)", graphLineColor: "rgb(255,140,0)"}
     } as any;
-    
     ctx.fillStyle = (themeColors[currentTheme] as any).graphBackgroundColor;
     ctx.fillRect(0, 0, graphCanvas.width / scaleFactor, graphCanvas.height / scaleFactor);
     ctx.beginPath();
     ctx.strokeStyle = (themeColors[currentTheme] as any).graphLineColor;
     ctx.lineWidth = 2;
-    
-    // Plot WPM over time
-    for (let i = 0; i < wpmHistory.length; i++) {
-        const x = padding + (wpmHistory[i].time / maxTime) * graphWidth;
-        const y = graphHeight - (wpmHistory[i].wpm / maxWpm) * graphHeight + padding;
-        
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
+    const xIncrement = graphWidth / (wpmHistory.length - 1);
+    let x = padding;
+    ctx.moveTo(x, graphHeight - wpmHistory[0].wpm / maxWpm * graphHeight + padding);
+    for (let i = 1; i < wpmHistory.length; i++) {
+        const y = graphHeight - wpmHistory[i].wpm / maxWpm * graphHeight + padding;
+        ctx.lineTo(x, y);
+        x += xIncrement;
     }
-    
     ctx.stroke();
 } 
