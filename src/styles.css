@@ -432,3 +432,47 @@ body.body2 .retry-button:hover {
     background-color: rgb(00, 00, 00);
     color: #FFFFFF;
 }
+
+/* Footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.footer.hidden {
+    opacity: 0 !important;
+    transform: translateY(20px) !important;
+    pointer-events: none !important;
+}
+
+.shortcut-info {
+    display: flex;
+    gap: 30px;
+    font-family: "Ubuntu Sans Mono", monospace;
+    font-size: 14px;
+    color: #666;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+body.body .shortcut-item {
+    color: #666;
+}
+
+body.body2 .shortcut-item {
+    color: #888;
+}

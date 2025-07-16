@@ -1,5 +1,5 @@
 // Import navigation bar functions
-import { hideNavbar, showNavbar } from './animation';
+import { hideNavbar, showNavbar, hideFooter, showFooter } from './animation';
 // Import paragraphs data as raw text
 import paragraphsData from './assets/data/paragraphs.txt?raw';
 
@@ -42,14 +42,12 @@ let testText: string = "";
 let currentIndex: number = 0;
 let correctChars: number = 0;
 let totalChars: number = 0;
-let timerStarted: boolean = false;
 let startTime: number | null = null;
 let wpmHistory: WPMHistoryItem[] = [];
 let consistencyScores: number[] = [];
 let lastCharacterTime: number | null = null;
 let currentConsistency: number = 100;
 let paragraphs: string[] = [];
-let currentParagraphIndex: number = 0;
 let testStarted: boolean = false;
 
 // Canvas and keyboard state
@@ -59,8 +57,8 @@ if (canvas && ctx) {
     const scaleFactor = window.devicePixelRatio || 2;
     canvas.width = 750 * scaleFactor;
     canvas.height = 250 * scaleFactor;
-    canvas.style.width = "750px";
-    canvas.style.height = "250px";
+    canvas.style.width = "600px";
+    canvas.style.height = (600 / 3).toString() + "px";
     ctx.scale(scaleFactor, scaleFactor);
 }
 
@@ -219,8 +217,8 @@ function handleTyping(event: KeyboardEvent): void {
     const validKeyRegex = /^[a-zA-Z0-9 .,;'/[\]\\\-_=+{}|:>?<()*&^!@#$%~`"]$/;
     const typedChar = event.key;
     
-    // Handle Enter key to end the test
-    if (event.key === "Enter") {
+    // Handle Shift + Enter to end the test
+    if (event.key === "Enter" && event.shiftKey) {
         event.preventDefault();
         endTypingTest();
         return;
@@ -250,8 +248,9 @@ function handleTyping(event: KeyboardEvent): void {
         startTime = (new Date()).getTime();
         lastCharacterTime = (new Date()).getTime();
         startMetricUpdater();
-        // Hide navigation bar when typing starts
+        // Hide navigation bar and footer when typing starts
         hideNavbar();
+        hideFooter();
     }
     
     const typeTest = document.getElementById("typeTest") as HTMLElement;
@@ -461,8 +460,9 @@ function endTypingTest(): void {
         metricUpdaterInterval = null;
     }
     
-    // Show navigation bar when typing ends
+    // Show navigation bar and footer when typing ends
     showNavbar();
+    showFooter();
 
     const typeTest = document.getElementById('typeTest');
     if (typeTest) {
@@ -531,9 +531,8 @@ function endTypingTest(): void {
     const tryAgainButton = document.querySelector('.retry-button') as HTMLButtonElement;
     tryAgainButton.addEventListener('click', resetTestState);
     
-    // Add keyboard event listeners for tab and enter keys on result screen
     const resultScreenKeyHandler = (event: KeyboardEvent) => {
-        if (event.key === "Tab" || event.key === "Enter") {
+        if (event.key === "Tab") {
             event.preventDefault();
             document.removeEventListener('keydown', resultScreenKeyHandler);
             resetTestState();
@@ -590,8 +589,9 @@ function resetTestState(): void {
         consistencyScores = [];
         currentConsistency = 100;
         
-        // Show navigation bar when test is reset
+        // Show navigation bar and footer when test is reset
         showNavbar();
+        showFooter();
         
         if (metricUpdaterInterval) {
             clearInterval(metricUpdaterInterval);

@@ -122,3 +122,19 @@ export function showNavbar(): void {
         navbar.classList.add("visible");
     }
 }
+
+export function hideFooter(): void {
+    const footer = document.querySelector(".footer") as HTMLElement;
+    if (footer) {
+        footer.classList.remove("visible");
+        footer.classList.add("hidden");
+    }
+}
+
+export function showFooter(): void {
+    const footer = document.querySelector(".footer") as HTMLElement;
+    if (footer) {
+        footer.classList.remove("hidden");
+        footer.classList.add("visible");
+    }
+}
