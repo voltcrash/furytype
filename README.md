@@ -13,8 +13,8 @@ Welcome to FuryType, a website where you can test, practice and improve your typ
 With a simple no-nonsense UI, you can quickly jump on doing what matters the most - Typing.
 
 ## Features
-- **Endless Typing Mode**: Practice without pressure - no timers, no interruptions. Type for as long as you like, and simply press <kbd>Shift</kbd> + <kbd>Enter</kbd> to view your detailed typing stats.
-- **Minimalist, Distraction-Free UI**: Focus solely on your typing with a clean, clutter-free interface and visually appealing [themes](##Themes) designed for productivity.
+- **Endless Typing Mode**: Practice without pressure - no timers, no interruptions. Type for as long as you like, and simply press <kbd>Shift</kbd> + <kbd>Enter</kbd> to end the test and view your detailed typing stats.
+- **Minimalist, Distraction-Free UI**: Focus solely on your typing with a clean, clutter-free interface, designed for productivity. Wanna start over? Press <kbd>esc</kbd> to instantly restart the test - no mouse needed.
 - **Challenging, Real-World Texts**: Hone your skills with carefully curated passages from Wikipedia, offering a balanced mix of letters, numbers, and punctuation to challenge even advanced typists.
 
 ## Themes 🎨
