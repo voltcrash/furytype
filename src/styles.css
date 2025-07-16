@@ -1,7 +1,6 @@
 @import url("fonts.css");
 
 /* Global Styles */
-
 html {
     font-family: "Jost", sans-serif;
     font-optical-sizing: auto;
@@ -27,6 +26,7 @@ abbr {
     text-decoration: none;
 }
 
+/* Link Styles */
 a {
     transition: all 0.3s ease;
     font-size: 18.5px;
@@ -58,30 +58,9 @@ body.body2 a:hover {
     color: #FF8C00;
 }
 
-body.body .nav_bar_right ul li a:hover {
-    border-bottom: 2px ridge #FFC799;
-    padding: 12px 17px;
-    border-radius: 100px;
-    color: #FFC799;
-}
-
-body.body2 .nav_bar_right ul li a:hover {
-    border-bottom: 2px ridge #FF8C00;
-    padding: 12px 17px;
-    border-radius: 100px;
-    color: #FF8C00;
-}
-
 /* Typography */
-h1, h3 {
+h1 {
     font-weight: 500;
-}
-
-.main_heading {
-    text-align: center;
-    font-size: 35px;
-    font-family: "Jost", sans-serif;
-    font-weight: 600;
 }
 
 /* Navigation Bar */
@@ -122,11 +101,18 @@ h1, h3 {
     border-bottom: 2px ridge transparent;
 }
 
-.nav_bar_right ul li a:hover {
+body.body .nav_bar_right ul li a:hover {
     border-bottom: 2px ridge #FFC799;
     padding: 12px 17px;
     border-radius: 100px;
     color: #FFC799;
+}
+
+body.body2 .nav_bar_right ul li a:hover {
+    border-bottom: 2px ridge #FF8C00;
+    padding: 12px 17px;
+    border-radius: 100px;
+    color: #FF8C00;
 }
 
 /* Logo */
@@ -143,11 +129,7 @@ h1, h3 {
     height: 60px;
 }
 
-.logo-icon.rotate {
-    transform: rotate(405deg);
-}
-
-/* typing interface styles */
+/* Typing Interface */
 .canvas-wrapper {
     display: flex;
     justify-content: center;
@@ -185,7 +167,6 @@ h1, h3 {
     width: 2px;
     height: 1.5rem;
     background-color: #FFC799;
-    animation: blink 1s steps(1) infinite;
     transition: left 0.05s ease-out, top 0.05s ease-out;
 }
 
@@ -193,6 +174,7 @@ body.body2 .caret {
     background-color: #FF8C00;
 }
 
+/* Character States */
 body.body .untyped {
     color: #A0A0A0;
 }
@@ -213,6 +195,7 @@ body.body2 .correct {
     color: #000000;
 }
 
+/* Time Bar */
 #timeBarContainer {
     position: fixed;
     top: 0;
@@ -232,39 +215,7 @@ body.body2 #timeBar {
     background-color: #FFC799;
 }
 
-#typingMetrics {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 20px;
-    font-size: 20px;
-    font-family: "Jost", sans-serif;
-    font-weight: 400;
-    color: #4C3E32;
-    border-radius: 15px;
-    background: #1C1C1C;
-    width: 300px;
-    height: 30px;
-    padding: 5px;
-}
-
-
-#typingMetrics.visible {
-    visibility: visible;
-    opacity: 1;
-}
-
-body.body2 #typingMetrics {
-    color: #FF8C00;
-    background: #E3E3E3;
-}
-
+/* Result Screen */
 .result-screen {
     position: fixed;
     top: 0;
@@ -288,7 +239,6 @@ body.body2 #typingMetrics {
 body.body2 .result-screen {
     background-color: rgb(255, 255, 255);
 }
-
 
 @keyframes fadeIn {
     from {
@@ -348,7 +298,6 @@ body.body2 .result-screen .main-result span {
     margin-top: 30px;
 }
 
-
 .result-screen .metric {
     display: flex;
     flex-direction: row;
@@ -398,6 +347,7 @@ body.body2 .result-screen .metric span {
     }
 }
 
+/* Retry Button */
 .retry-button {
     position: relative;
     width: 60px;
@@ -425,11 +375,11 @@ body.body2 .retry-button {
 .retry-button:hover {
     transform: translateY(-2px);
     background-color: #FFFFFF;
-    color: #000000
+    color: #000000;
 }
 
 body.body2 .retry-button:hover {
-    background-color: rgb(00, 00, 00);
+    background-color: rgb(0, 0, 0);
     color: #FFFFFF;
 }
 
@@ -475,4 +425,14 @@ body.body .shortcut-item {
 
 body.body2 .shortcut-item {
     color: #888;
+}
+
+/* Animations */
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
 }

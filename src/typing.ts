@@ -128,7 +128,6 @@ function initializeTypingTestUI(): void {
     correctChars = 0;
     totalChars = 0;
     testStarted = false;
-    updateMetrics(0, 100, 0);
     wpmHistory = [];
     consistencyScores = [];
     startTime = null;
@@ -146,25 +145,6 @@ function initializeTypingTestUI(): void {
     
     // Create text display with 3-line limit
     createTextDisplay();
-    
-    // Remove any existing typing metrics first
-    const existingMetrics = document.getElementById("typingMetrics");
-    if (existingMetrics) {
-        existingMetrics.remove();
-    }
-    
-    // Create new typing metrics
-    const typeTest = document.getElementById("typeTest") as HTMLElement;
-    const typingMetrics = document.createElement("div");
-    typingMetrics.id = "typingMetrics";
-    typingMetrics.innerHTML = `
-        <span id="wpm">0wpm</span> <span id="accuracy">0%acc</span>  <span id="rawWpm">0raw</span>
-    `;
-    typingMetrics.style.position = "absolute";
-    typingMetrics.style.top = "-55px";
-    typingMetrics.style.left = "0";
-    typeTest.appendChild(typingMetrics);
-    typingMetrics.classList.remove("visible");
     
     document.removeEventListener("keydown", handleTyping);
     document.addEventListener("keydown", handleTyping);
@@ -224,8 +204,8 @@ function handleTyping(event: KeyboardEvent): void {
         return;
     }
     
-    // Handle tab key to refresh the test
-    if (event.key === "Tab") {
+    // Handle Escape key to refresh the test
+    if (event.key === "Escape") {
         event.preventDefault();
         resetTestState();
         return;
@@ -247,7 +227,6 @@ function handleTyping(event: KeyboardEvent): void {
         testStarted = true;
         startTime = (new Date()).getTime();
         lastCharacterTime = (new Date()).getTime();
-        startMetricUpdater();
         // Hide navigation bar and footer when typing starts
         hideNavbar();
         hideFooter();
@@ -421,45 +400,7 @@ function calculateAccuracy(correctChars: number, totalChars: number): number {
     return Math.round(correctChars / totalChars * 100);
 }
 
-function updateMetrics(wpm: number, accuracy: number, rawWpm: number): void {
-    let typingMetrics = document.getElementById("typingMetrics") as HTMLElement;
-    if (!typingMetrics) {
-        typingMetrics = document.createElement("div");
-        typingMetrics.id = "typingMetrics";
-        typingMetrics.style.position = "absolute";
-        typingMetrics.style.top = "-55px";
-        typingMetrics.style.left = "0";
-        const typeTest = document.getElementById("typeTest");
-        if (typeTest) typeTest.appendChild(typingMetrics);
-    }
-    if (!typingMetrics.classList.contains("visible")) {
-        typingMetrics.classList.add("visible");
-    }
-    typingMetrics.innerHTML = `
-        <span id="wpm">${wpm}wpm</span> <span id="accuracy">${accuracy}%acc</span> <span id="rawWpm">${rawWpm}raw</span>
-    `;
-}
-
-let metricUpdaterInterval: number | null = null;
-
-function startMetricUpdater(): void {
-    metricUpdaterInterval = window.setInterval(() => {
-        if (startTime) {
-            const elapsedTime = ((new Date()).getTime() - startTime) / 1000;
-            const wpm = calculateWPM(correctChars, elapsedTime);
-            const accuracy = calculateAccuracy(correctChars, totalChars);
-            const rawWpm = Math.round(totalChars / elapsedTime * 60 * 0.2);
-            updateMetrics(wpm, accuracy, rawWpm);
-        }
-    }, 100);
-}
-
 function endTypingTest(): void {
-    if (metricUpdaterInterval) {
-        clearInterval(metricUpdaterInterval);
-        metricUpdaterInterval = null;
-    }
-    
     // Show navigation bar and footer when typing ends
     showNavbar();
     showFooter();
@@ -532,18 +473,13 @@ function endTypingTest(): void {
     tryAgainButton.addEventListener('click', resetTestState);
     
     const resultScreenKeyHandler = (event: KeyboardEvent) => {
-        if (event.key === "Tab") {
+        if (event.key === "Enter") {
             event.preventDefault();
             document.removeEventListener('keydown', resultScreenKeyHandler);
             resetTestState();
         }
     };
     document.addEventListener('keydown', resultScreenKeyHandler);
-    
-    const typingMetrics = document.getElementById("typingMetrics");
-    if (typingMetrics) {
-        typingMetrics.remove();
-    }
 }
 
 function sendRaceData(raceData: RaceData): void {
@@ -592,11 +528,6 @@ function resetTestState(): void {
         // Show navigation bar and footer when test is reset
         showNavbar();
         showFooter();
-        
-        if (metricUpdaterInterval) {
-            clearInterval(metricUpdaterInterval);
-            metricUpdaterInterval = null;
-        }
         
         const resultScreen = document.getElementById("resultScreen") as HTMLElement;
         if (resultScreen) {
