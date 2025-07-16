@@ -1,5 +1,7 @@
 // Import navigation bar functions
 import { hideNavbar, showNavbar } from './animation';
+// Import paragraphs data as raw text
+import paragraphsData from './assets/data/paragraphs.txt?raw';
 
 // Interfaces and types
 interface Key {
@@ -110,40 +112,19 @@ export function initializeTypingTest(): void {
 }
 
 function fetchParagraphs(): void {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/src/assets/data/paragraphs.txt", true);
-    xhr.timeout = 10000; // 10 second timeout
-    
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            const fetchedParagraphs = xhr.responseText.split("\n").filter((line: string) => line.trim() !== "");
-            if (fetchedParagraphs.length > 0) {
-                paragraphs = fetchedParagraphs;
-            } else {
-                paragraphs = fallbackParagraphs;
-            }
-            testText = getRandomParagraph();
-            initializeTypingTestUI();
+    try {
+        const fetchedParagraphs = paragraphsData.split("\n").filter((line: string) => line.trim() !== "");
+        if (fetchedParagraphs.length > 0) {
+            paragraphs = fetchedParagraphs;
         } else {
             paragraphs = fallbackParagraphs;
-            testText = getRandomParagraph();
-            initializeTypingTestUI();
         }
-    };
-    
-    xhr.onerror = function () {
+    } catch (error) {
+        console.error("Error loading paragraphs:", error);
         paragraphs = fallbackParagraphs;
-        testText = getRandomParagraph();
-        initializeTypingTestUI();
-    };
-    
-    xhr.ontimeout = function () {
-        paragraphs = fallbackParagraphs;
-        testText = getRandomParagraph();
-        initializeTypingTestUI();
-    };
-    
-    xhr.send();
+    }
+    testText = getRandomParagraph();
+    initializeTypingTestUI();
 }
 
 function initializeTypingTestUI(): void {
