@@ -427,7 +427,7 @@ body.body2 .shortcut-item {
     color: #888;
 }
 
-/* Animations */
+/* Animations
 @keyframes blink {
     0%, 50% {
         opacity: 1;
@@ -435,4 +435,21 @@ body.body2 .shortcut-item {
     51%, 100% {
         opacity: 0;
     }
+} */
+
+kbd {
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.95em;
+
+    display: inline-block;
+    margin: 0 2px;
+}
+
+body.body kbd {
+    background: #1C1C1C;
+}
+
+body.body2  kbd {
+    background: #E3E3E3;
 }

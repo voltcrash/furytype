@@ -16,6 +16,7 @@ function startPageAnimation(): void {
     const logoIcon = document.getElementById("themeToggle") as HTMLImageElement;
     const mainContent = document.querySelector("main") as HTMLElement;
     const header = document.querySelector("header") as HTMLElement;
+    const kbd = document.querySelector("kbd") as HTMLElement;
     body.style.opacity = "0";
 
     setTimeout(() => {
