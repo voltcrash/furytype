@@ -23,7 +23,7 @@ FuryType offers two visually appealing and comfortable themes inspired by <a hre
 ### Dark Theme (default)
 <img src="docs/images/site-dark.png">
 <img src="docs/images/site-dark-typing.png">
-<img src="docs/images/site-dark-results.png"
+<img src="docs/images/site-dark-results.png">
 
 ### Light Theme
 <img src="docs/images/site-light.png">
